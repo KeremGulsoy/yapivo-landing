@@ -228,26 +228,6 @@ export default function Dashboard() {
             </div>
           ))}
         </nav>
-
-        {/* Kullanıcı kartı */}
-        <div style={{ padding: '10px', borderTop: `1px solid rgba(255,255,255,0.06)`, flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px', borderRadius: '7px', cursor: 'pointer' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: C.dark2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '700', color: C.cream, flexShrink: 0 }}>
-              {initials}
-            </div>
-            {!sidebarCollapsed && (
-              <>
-                <div style={{ flex: 1, overflow: 'hidden' }}>
-                  <div style={{ fontSize: '12px', fontWeight: '600', color: C.cream, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{profile?.full_name || user?.email}</div>
-                  <div style={{ fontSize: '10px', color: 'rgba(248,247,244,0.35)', textTransform: 'capitalize' }}>{profile?.role}</div>
-                </div>
-                <span onClick={handleLogout} title="Çıkış" style={{ fontSize: '14px', color: 'rgba(248,247,244,0.3)', cursor: 'pointer', flexShrink: 0 }}>⏻</span>
-              </>
-            )}
-          </div>
-        </div>
       </aside>
 
       {/* ── MAIN ── */}
@@ -292,9 +272,20 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
-            {/* Avatar */}
-            <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: C.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700', color: C.cream }}>
-              {initials}
+            {/* Kullanıcı + Çıkış */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingLeft: '12px', borderLeft: `1px solid ${C.border}` }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '700', color: C.cream, flexShrink: 0 }}>
+                {initials}
+              </div>
+              <div>
+                <div style={{ fontSize: '13px', fontWeight: '600', color: C.dark }}>{profile?.full_name || user?.email}</div>
+                <div style={{ fontSize: '11px', color: C.text3, textTransform: 'capitalize' }}>{profile?.role === 'owner' ? 'Patron' : profile?.role === 'admin' ? 'Yönetici' : profile?.role === 'accountant' ? 'Muhasebeci' : profile?.role}</div>
+              </div>
+              <button onClick={handleLogout}
+                title="Çıkış Yap"
+                style={{ width: '30px', height: '30px', borderRadius: '7px', background: C.cream2, border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '14px', color: C.text3 }}>
+                ⏻
+              </button>
             </div>
           </div>
         </div>
