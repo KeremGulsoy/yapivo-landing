@@ -449,6 +449,10 @@ function ProjectsPage({ company, fmt, fmtDate, C }) {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
+  const [detailModal, setDetailModal] = useState(false)
+  const [selectedProject, setSelectedProject] = useState(null)
+  const [projectTxs, setProjectTxs] = useState([])
+  const [projectTxLoading, setProjectTxLoading] = useState(false)
   const [editItem, setEditItem] = useState(null)
   const [filter, setFilter] = useState('all')
   const [form, setForm] = useState({ name: '', address: '', budget: 0, start_date: '', end_date: '', status: 'active', description: '' })
@@ -460,8 +464,22 @@ function ProjectsPage({ company, fmt, fmtDate, C }) {
       .then(({ data }) => { setProjects(data || []); setLoading(false) })
   }, [company])
 
+  const openDetail = async (p) => {
+    setSelectedProject(p)
+    setDetailModal(true)
+    setProjectTxLoading(true)
+    const { data } = await supabase
+      .from('transactions')
+      .select('*, categories(name), contacts(name)')
+      .eq('company_id', company.id)
+      .eq('project_id', p.id)
+      .order('date', { ascending: false })
+    setProjectTxs(data || [])
+    setProjectTxLoading(false)
+  }
+
   const openNew = () => { setEditItem(null); setForm({ name: '', address: '', budget: 0, start_date: '', end_date: '', status: 'active', description: '' }); setModal(true) }
-  const openEdit = (p) => { setEditItem(p); setForm({ name: p.name, address: p.address || '', budget: p.budget || 0, start_date: p.start_date || '', end_date: p.end_date || '', status: p.status, description: p.description || '' }); setModal(true) }
+  const openEdit = (p, e) => { e.stopPropagation(); setEditItem(p); setForm({ name: p.name, address: p.address || '', budget: p.budget || 0, start_date: p.start_date || '', end_date: p.end_date || '', status: p.status, description: p.description || '' }); setModal(true) }
 
   const save = async () => {
     if (!form.name) return
@@ -501,12 +519,13 @@ function ProjectsPage({ company, fmt, fmtDate, C }) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                {['Proje Adı','Adres','Bütçe','Başlangıç','Bitiş','Durum',''].map(h => <th key={h} style={{ padding: '10px 16px', color: C.text3, fontSize: '11px', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', fontWeight: '500' }}>{h}</th>)}
+                {['Proje Adı','Adres','Bütçe','Başlangıç','Bitiş','Durum','',''].map(h => <th key={h} style={{ padding: '10px 16px', color: C.text3, fontSize: '11px', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', fontWeight: '500' }}>{h}</th>)}
               </tr>
             </thead>
             <tbody>
               {filtered.map((p, i) => (
-                <tr key={p.id} style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : 'none' }}
+                <tr key={p.id} style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : 'none', cursor: 'pointer' }}
+                  onClick={() => openDetail(p)}
                   onMouseEnter={e => e.currentTarget.style.background = C.cream2}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <td style={{ padding: '12px 16px' }}>
@@ -523,7 +542,10 @@ function ProjectsPage({ company, fmt, fmtDate, C }) {
                     </span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <button onClick={() => openEdit(p)} style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Düzenle</button>
+                    <span style={{ fontSize: '12px', color: C.amber, fontWeight: '600' }}>Detay →</span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }} onClick={e => e.stopPropagation()}>
+                    <button onClick={(e) => openEdit(p, e)} style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Düzenle</button>
                   </td>
                 </tr>
               ))}
@@ -532,6 +554,97 @@ function ProjectsPage({ company, fmt, fmtDate, C }) {
         )}
       </div>
 
+      {/* PROJE DETAY MODAL */}
+      {detailModal && selectedProject && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(27,46,94,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#FAFAF8', borderRadius: '14px', width: '100%', maxWidth: '780px', maxHeight: '90vh', overflowY: 'auto' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: `1px solid ${C.border}` }}>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: C.dark, margin: 0 }}>{selectedProject.name}</h3>
+                <p style={{ fontSize: '12px', color: C.text3, margin: '3px 0 0' }}>
+                  {selectedProject.address && `${selectedProject.address} · `}
+                  {fmtDate(selectedProject.start_date)} — {fmtDate(selectedProject.end_date)}
+                  {selectedProject.budget > 0 && ` · Bütçe: ${fmt(selectedProject.budget)}`}
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button onClick={(e) => { setDetailModal(false); openEdit(selectedProject, e) }}
+                  style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: `1px solid ${C.amber}`, borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>
+                  Düzenle
+                </button>
+                <button onClick={() => setDetailModal(false)} style={{ background: 'none', border: 'none', fontSize: '22px', color: C.text3, cursor: 'pointer' }}>×</button>
+              </div>
+            </div>
+
+            {/* Finansal özet */}
+            {!projectTxLoading && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+                {(() => {
+                  const income = projectTxs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
+                  const expense = projectTxs.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
+                  const net = income - expense
+                  const budget = selectedProject.budget || 0
+                  const budgetUsed = budget > 0 ? Math.round((expense / budget) * 100) : null
+                  return [
+                    [fmt(income), 'Toplam Gelir', C.green, C.greenBg],
+                    [fmt(expense), 'Toplam Gider', C.red, C.redBg],
+                    [fmt(net), 'Net Kar / Zarar', net >= 0 ? C.green : C.red, net >= 0 ? C.greenBg : C.redBg],
+                    [budgetUsed !== null ? `%${budgetUsed}` : '—', 'Bütçe Kullanımı', budgetUsed > 90 ? C.red : budgetUsed > 70 ? C.amber : C.dark, C.cream],
+                  ].map(([val, label, color, bg]) => (
+                    <div key={label} style={{ background: bg, borderRadius: '8px', padding: '12px 14px', border: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: '10px', color: C.text3, marginBottom: '4px', letterSpacing: '0.04em' }}>{label.toUpperCase()}</div>
+                      <div style={{ fontSize: '18px', fontWeight: '800', color, fontVariantNumeric: 'tabular-nums' }}>{val}</div>
+                    </div>
+                  ))
+                })()}
+              </div>
+            )}
+
+            {/* İşlem geçmişi */}
+            <div style={{ padding: '16px 20px' }}>
+              <h4 style={{ fontSize: '13px', fontWeight: '700', color: C.dark, marginBottom: '12px' }}>İşlem Geçmişi</h4>
+              {projectTxLoading ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Yükleniyor...</div>
+              ) : projectTxs.length === 0 ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Bu projeye ait işlem bulunmuyor.</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                      {['Açıklama','Cari','Kategori','Tarih','Tutar'].map(h => (
+                        <th key={h} style={{ padding: '8px 12px', color: C.text3, fontSize: '11px', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', fontWeight: '500' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {projectTxs.map((t, i) => (
+                      <tr key={t.id} style={{ borderBottom: i < projectTxs.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                        <td style={{ padding: '10px 12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '22px', height: '22px', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: t.type === 'income' ? C.greenBg : C.redBg, color: t.type === 'income' ? C.green : C.red, fontSize: '12px', flexShrink: 0 }}>{t.type === 'income' ? '↑' : '↓'}</div>
+                            <span style={{ fontWeight: '600', color: C.dark }}>{t.title}</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '10px 12px', color: C.text2 }}>{t.contacts?.name || '—'}</td>
+                        <td style={{ padding: '10px 12px' }}>
+                          {t.categories ? <span style={{ fontSize: '11px', padding: '2px 7px', borderRadius: '4px', background: 'rgba(27,46,94,0.08)', color: C.dark2 }}>{t.categories.name}</span> : <span style={{ color: C.text3 }}>—</span>}
+                        </td>
+                        <td style={{ padding: '10px 12px', color: C.text2 }}>{fmtDate(t.date)}</td>
+                        <td style={{ padding: '10px 12px', fontWeight: '700', color: t.type === 'income' ? C.green : C.red, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                          {t.type === 'income' ? '+' : '-'}{fmtAmount(t.amount, t.currency)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FORM MODAL */}
       {modal && (
         <Modal title={editItem ? 'Projeyi Düzenle' : 'Yeni Proje'} onClose={() => setModal(false)} onSave={save} saving={saving} C={C}>
           <FRow><FField label="Proje Adı *" C={C} full><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Kadıköy Konut Projesi" style={inp(C)}/></FField></FRow>
