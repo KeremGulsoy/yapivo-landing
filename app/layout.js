@@ -2,7 +2,7 @@ import './globals.css'
 
 export const metadata = {
   title: 'Yapivo — İnşaatınızın Dijital Defteri',
-  description: 'Proje yönetimi, masraf takibi, finans kontrolü. İnşaat şirketleri için dijital çözüm.',
+  description: 'Proje yönetimi, masraf takibi, finans kontrolü.',
 }
 
 export default function RootLayout({ children }) {
