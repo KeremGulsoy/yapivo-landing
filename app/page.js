@@ -84,6 +84,7 @@ export default function Home() {
       'Profesyonel\'deki her şey',
       'Teklif & Sözleşme modülü',
       'Çoklu şirket (2 firma)',
+      'Sınırsız görev ve belge',
       'Öncelikli destek (4s SLA)',
       'Özel onboarding & eğitim',
     ],
