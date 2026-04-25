@@ -35,77 +35,61 @@ export default function Home() {
   const p = prices[billingCycle]
 
   const plans = [
-    {
-      name: 'Başlangıç',
-      price: p.starter,
-      desc: 'Sistemi öğren, temeli kur.',
-      color: C.dark,
-      highlight: false,
-      users: '2 kullanıcı',
-      extra: '₺150/ek kullanıcı',
-      features: [
-        { text: 'Sınırsız proje', yes: true },
-        { text: 'Gelir / Gider takibi', yes: true },
-        { text: 'Cari yönetimi', yes: true },
-        { text: 'Personel yönetimi', yes: true },
-        { text: 'Görev yönetimi (proje başına 10)', yes: true },
-        { text: 'Kategori yönetimi', yes: true },
-        { text: 'Temel raporlar', yes: true },
-        { text: 'Finans / Kasalar', yes: false },
-        { text: 'Çek / Senet takibi', yes: false },
-        { text: 'Hakediş yönetimi', yes: false },
-        { text: 'Daire satış modülü', yes: false },
-      ],
-      cta: 'Ücretsiz Dene',
-      ctaStyle: 'outline',
-    },
-    {
-      name: 'Profesyonel',
-      price: p.pro,
-      desc: 'Günlük işi keyifli kılan her şey.',
-      color: C.amber,
-      highlight: true,
-      badge: 'En Popüler',
-      users: '5 kullanıcı',
-      extra: '₺120/ek kullanıcı',
-      features: [
-        { text: 'Başlangıç\'taki her şey', yes: true },
-        { text: 'Sınırsız görev yönetimi', yes: true },
-        { text: 'Finans / Kasalar', yes: true },
-        { text: 'Çek / Senet takibi', yes: true },
-        { text: 'Hakediş yönetimi', yes: true },
-        { text: 'Daire satış modülü', yes: true },
-        { text: 'PDF çıktı (hakediş, teklif)', yes: true },
-        { text: 'Gelişmiş raporlar', yes: true },
-        { text: 'Teklif yönetimi', yes: false },
-        { text: 'Sözleşme modülü', yes: false },
-        { text: 'Çoklu şirket', yes: false },
-      ],
-      cta: 'Ücretsiz Dene',
-      ctaStyle: 'filled',
-    },
-    {
-      name: 'Kurumsal',
-      price: p.enterprise,
-      desc: 'Büyük firma, tam kontrol.',
-      color: C.dark,
-      highlight: false,
-      users: '15 kullanıcı',
-      extra: '₺100/ek kullanıcı',
-      features: [
-        { text: 'Profesyonel\'deki her şey', yes: true },
-        { text: 'Teklif yönetimi', yes: true },
-        { text: 'Sözleşme modülü', yes: true },
-        { text: 'Çoklu şirket (2 firma)', yes: true },
-        { text: 'Sınırsız görev ve belge', yes: true },
-        { text: 'Öncelikli destek (4s SLA)', yes: true },
-        { text: 'Özel onboarding görüşmesi', yes: true },
-        { text: 'Özel eğitim ve kurulum', yes: true },
-      ],
-      cta: 'İletişime Geç',
-      ctaStyle: 'outline',
-    },
-  ]
+  {
+    name: 'Başlangıç',
+    price: p.starter,
+    desc: 'Sistemi öğren, temeli kur.',
+    color: C.dark,
+    highlight: false,
+    users: '2 kullanıcı',
+    extra: '₺150/ek kullanıcı',
+    features: [
+      'Sınırsız proje',
+      'Gelir / Gider takibi',
+      'Cari yönetimi',
+      'Personel & Görev yönetimi',
+      'Kategori yönetimi',
+      'Temel raporlar',
+    ],
+    cta: 'Ücretsiz Dene',
+  },
+  {
+    name: 'Profesyonel',
+    price: p.pro,
+    desc: 'Günlük işi keyifli kılan her şey.',
+    color: C.amber,
+    highlight: true,
+    badge: 'En Popüler',
+    users: '5 kullanıcı',
+    extra: '₺120/ek kullanıcı',
+    features: [
+      'Başlangıç\'taki her şey',
+      'Finans / Kasalar & Çek/Senet',
+      'Hakediş yönetimi',
+      'Daire satış modülü',
+      'PDF çıktı',
+      'Gelişmiş raporlar',
+    ],
+    cta: 'Ücretsiz Dene',
+  },
+  {
+    name: 'Kurumsal',
+    price: p.enterprise,
+    desc: 'Büyük firma, tam kontrol.',
+    color: C.dark,
+    highlight: false,
+    users: '15 kullanıcı',
+    extra: '₺100/ek kullanıcı',
+    features: [
+      'Profesyonel\'deki her şey',
+      'Teklif & Sözleşme modülü',
+      'Çoklu şirket (2 firma)',
+      'Öncelikli destek (4s SLA)',
+      'Özel onboarding & eğitim',
+    ],
+    cta: 'İletişime Geç',
+  },
+]
 
   const features = [
     {
@@ -337,13 +321,9 @@ export default function Home() {
                 <div style={{ borderTop: plan.highlight ? '1px solid rgba(27,46,94,0.15)' : '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
                   {plan.features.map((f, j) => (
                     <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '13px', flexShrink: 0, color: f.yes ? (plan.highlight ? C.dark : C.amber) : 'rgba(255,255,255,0.2)', fontWeight: '700' }}>
-                        {f.yes ? '✓' : '—'}
-                      </span>
-                      <span style={{ fontSize: '13px', color: f.yes ? (plan.highlight ? C.dark : 'rgba(248,247,244,0.85)') : 'rgba(255,255,255,0.25)' }}>
-                        {f.text}
-                      </span>
-                    </div>
+                      <span style={{ fontSize: '13px', flexShrink: 0, color: plan.highlight ? C.dark : C.amber, fontWeight: '700' }}>✓</span>
+                      <span style={{ fontSize: '13px', color: plan.highlight ? C.dark : 'rgba(248,247,244,0.8)' }}>{f}</span>
+                  </div>
                   ))}
                 </div>
               </div>
