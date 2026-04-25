@@ -20,7 +20,18 @@ export default function Login() {
     if (error) {
       setError('Email veya şifre hatalı.')
     } else {
-      window.location.href = '/dashboard'
+      // Şirketi var mı kontrol et
+	const { data: profile } = await supabase
+	  .from('profiles')
+	  .select('company_id')
+	  .eq('id', data.user.id)
+	  .single()
+
+	if (profile?.company_id) {
+	  window.location.href = '/dashboard'
+	} else {
+	  window.location.href = '/setup'
+	}
     }
     setLoading(false)
   }
