@@ -48,7 +48,7 @@ export default function Login() {
     if (error) {
       setError(error.message)
     } else {
-      setMessage('Kayıt başarılı! Email adresinizi doğrulayın.')
+      setMessage('Kayıt başarılı! Email adresinizi doğrulayın, ardından giriş yaparak şirketinizi kurun.')
     }
     setLoading(false)
   }
