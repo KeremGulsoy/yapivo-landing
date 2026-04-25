@@ -14,8 +14,27 @@ export default function Login() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Oturum var mı veya email doğrulandı mı kontrol et
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const handleAuth = async () => {
+      const hash = window.location.hash
+      if (hash && hash.includes('access_token')) {
+        await new Promise(r => setTimeout(r, 1000))
+        const { data } = await supabase.auth.getSession()
+        if (data?.session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('company_id')
+            .eq('id', data.session.user.id)
+            .single()
+          if (profile?.company_id) {
+            window.location.href = '/dashboard'
+          } else {
+            window.location.href = '/setup'
+          }
+          return
+        }
+      }
+
+      const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -28,9 +47,10 @@ export default function Login() {
           window.location.href = '/setup'
         }
       }
-    })
+    }
 
-    // Email doğrulama sonrası otomatik yönlendir
+    handleAuth()
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         const { data: profile } = await supabase
@@ -119,7 +139,6 @@ export default function Login() {
       }}/>
 
       <div style={{ width: '100%', maxWidth: '440px', position: 'relative', zIndex: 1 }}>
-        {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
@@ -143,9 +162,7 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Kart */}
         <div style={{ backgroundColor: '#F8F7F4', borderRadius: '20px', padding: '36px' }}>
-          {/* Tab */}
           {mode !== 'forgot' && (
             <div style={{
               display: 'flex', backgroundColor: '#E5E0D8',
