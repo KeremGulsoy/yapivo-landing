@@ -44,48 +44,53 @@ const fmt = (n) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency:
 const fmtNum = (n) => new Intl.NumberFormat('tr-TR').format(n || 0)
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('tr-TR') : '—'
 
-// Binlik ayraç ile input değerini formatlama
-const formatNumberInput = (val) => {
-  const clean = String(val).replace(/\./g, '').replace(',', '.')
-  const num = parseFloat(clean)
-  if (isNaN(num)) return ''
-  return new Intl.NumberFormat('tr-TR').format(num)
+const CURRENCIES = [
+  { code: 'TRY', symbol: '₺', label: 'Türk Lirası (₺)' },
+  { code: 'USD', symbol: '$', label: 'Amerikan Doları ($)' },
+  { code: 'EUR', symbol: '€', label: 'Euro (€)' },
+  { code: 'GOLD', symbol: 'gr', label: 'Altın (gr)' },
+]
+
+const getCurrencySymbol = (code) => CURRENCIES.find(c => c.code === code)?.symbol || '₺'
+
+const fmtAmount = (amount, currency = 'TRY') => {
+  const sym = getCurrencySymbol(currency)
+  const formatted = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: currency === 'GOLD' ? 2 : 0, maximumFractionDigits: currency === 'TRY' ? 0 : 2 }).format(amount || 0)
+  return `${sym}${formatted}`
 }
 
-const parseNumberInput = (val) => {
-  // "1.250.000" → 1250000
-  return parseFloat(String(val).replace(/\./g, '').replace(',', '.')) || 0
-}
-
-// ── NUMBER INPUT BİLEŞENİ ──
+// ── NUMBER INPUT — yazarken nokta koyar ──
 function NumberInput({ value, onChange, placeholder, style }) {
-  const [display, setDisplay] = useState(value ? fmtNum(value) : '')
+  const inputRef = useRef(null)
+  const [display, setDisplay] = useState('')
 
   useEffect(() => {
-    setDisplay(value ? fmtNum(value) : '')
-  }, [value])
-
-  const handleChange = (e) => {
-    const raw = e.target.value.replace(/[^\d,]/g, '')
-    setDisplay(raw)
-  }
-
-  const handleBlur = () => {
-    const num = parseNumberInput(display)
-    if (num > 0) {
-      setDisplay(fmtNum(num))
-      onChange(num)
+    if (value && value !== 0) {
+      setDisplay(fmtNum(value))
     } else {
       setDisplay('')
-      onChange(0)
     }
+  }, [])
+
+  const handleChange = (e) => {
+    const raw = e.target.value
+    // Sadece rakam ve virgüle izin ver
+    const digitsOnly = raw.replace(/[^\d,]/g, '')
+    // Virgülden önce binlik nokta ekle
+    const parts = digitsOnly.split(',')
+    const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+    const formatted = parts.length > 1 ? intPart + ',' + parts[1].slice(0, 2) : intPart
+    setDisplay(formatted)
+    // Sayısal değeri parent'a gönder
+    const numericStr = parts[0].replace(/\./g, '') + (parts[1] !== undefined ? '.' + parts[1] : '')
+    onChange(parseFloat(numericStr) || 0)
   }
 
   return (
     <input
+      ref={inputRef}
       value={display}
       onChange={handleChange}
-      onBlur={handleBlur}
       placeholder={placeholder || '0'}
       style={style}
       inputMode="decimal"
@@ -556,7 +561,7 @@ function TransactionsPage({ company, fmt, fmtDate, C }) {
   const [modal, setModal] = useState(false)
   const [editItem, setEditItem] = useState(null)
   const [filter, setFilter] = useState('all')
-  const emptyForm = { title: '', type: 'expense', amount: 0, category_id: '', project_id: '', contact_id: '', payment_type: 'cash', date: new Date().toISOString().split('T')[0], notes: '' }
+  const emptyForm = { title: '', type: 'expense', amount: 0, currency: 'TRY', category_id: '', project_id: '', contact_id: '', payment_type: 'cash', date: new Date().toISOString().split('T')[0], notes: '' }
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
 
@@ -573,14 +578,14 @@ function TransactionsPage({ company, fmt, fmtDate, C }) {
   const openNew = () => { setEditItem(null); setForm(emptyForm); setModal(true) }
   const openEdit = (t) => {
     setEditItem(t)
-    setForm({ title: t.title, type: t.type, amount: t.amount, category_id: t.category_id || '', project_id: t.project_id || '', contact_id: t.contact_id || '', payment_type: t.payment_type || 'cash', date: t.date, notes: t.notes || '' })
+    setForm({ title: t.title, type: t.type, amount: t.amount, currency: t.currency || 'TRY', category_id: t.category_id || '', project_id: t.project_id || '', contact_id: t.contact_id || '', payment_type: t.payment_type || 'cash', date: t.date, notes: t.notes || '' })
     setModal(true)
   }
 
   const save = async () => {
     if (!form.title || !form.amount) return
     setSaving(true)
-    const payload = { company_id: company.id, title: form.title, type: form.type, amount: Number(form.amount), category_id: form.category_id || null, project_id: form.project_id || null, contact_id: form.contact_id || null, payment_type: form.payment_type, date: form.date, notes: form.notes, currency: 'TRY' }
+    const payload = { company_id: company.id, title: form.title, type: form.type, amount: Number(form.amount), currency: form.currency || 'TRY', category_id: form.category_id || null, project_id: form.project_id || null, contact_id: form.contact_id || null, payment_type: form.payment_type, date: form.date, notes: form.notes }
     if (editItem) {
       const { data } = await supabase.from('transactions').update(payload).eq('id', editItem.id).select('*, projects(name), categories(name,color), contacts(name)').single()
       if (data) setTxs(txs.map(t => t.id === editItem.id ? data : t))
@@ -648,7 +653,7 @@ function TransactionsPage({ company, fmt, fmtDate, C }) {
                   <td style={{ padding: '12px 12px', color: C.text2 }}>{{ cash:'Nakit', transfer:'Havale', cheque:'Çek', card:'Kart' }[t.payment_type] || '—'}</td>
                   <td style={{ padding: '12px 12px', color: C.text2 }}>{fmtDate(t.date)}</td>
                   <td style={{ padding: '12px 12px', fontWeight: '800', color: t.type === 'income' ? C.green : C.red, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                    {t.type === 'income' ? '+' : '-'}{new Intl.NumberFormat('tr-TR').format(t.amount)} ₺
+                    {t.type === 'income' ? '+' : '-'}{fmtAmount(t.amount, t.currency)}
                   </td>
                   <td style={{ padding: '12px 12px' }}>
                     <button onClick={() => openEdit(t)} style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Düzenle</button>
@@ -683,8 +688,13 @@ function TransactionsPage({ company, fmt, fmtDate, C }) {
           </FField>
 
           <FRow>
-            <FField label="Tutar (₺) *" C={C}>
-              <NumberInput value={form.amount} onChange={v => setForm({...form, amount: v})} style={inp(C)}/>
+            <FField label="Tutar *" C={C}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <NumberInput value={form.amount} onChange={v => setForm({...form, amount: v})} style={{...inp(C), flex: 1}}/>
+                <select value={form.currency} onChange={e => setForm({...form, currency: e.target.value})} style={{...inp(C), width: '100px', flexShrink: 0}}>
+                  {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>)}
+                </select>
+              </div>
             </FField>
             <FField label="Tarih" C={C}>
               <input type="date" value={form.date} onChange={e => setForm({...form, date: e.target.value})} style={inp(C)}/>
@@ -728,6 +738,10 @@ function ContactsPage({ company, fmt, C }) {
   const [contacts, setContacts] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
+  const [detailModal, setDetailModal] = useState(false)
+  const [selectedContact, setSelectedContact] = useState(null)
+  const [contactTxs, setContactTxs] = useState([])
+  const [contactTxLoading, setContactTxLoading] = useState(false)
   const [editItem, setEditItem] = useState(null)
   const [filter, setFilter] = useState('all')
   const emptyForm = { name: '', type: 'supplier', tax_number: '', tax_office: '', phone: '', email: '', address: '' }
@@ -740,8 +754,22 @@ function ContactsPage({ company, fmt, C }) {
       .then(({ data }) => { setContacts(data || []); setLoading(false) })
   }, [company])
 
+  const openDetail = async (c) => {
+    setSelectedContact(c)
+    setDetailModal(true)
+    setContactTxLoading(true)
+    const { data } = await supabase
+      .from('transactions')
+      .select('*, projects(name), categories(name)')
+      .eq('company_id', company.id)
+      .eq('contact_id', c.id)
+      .order('date', { ascending: false })
+    setContactTxs(data || [])
+    setContactTxLoading(false)
+  }
+
   const openNew = () => { setEditItem(null); setForm(emptyForm); setModal(true) }
-  const openEdit = (c) => { setEditItem(c); setForm({ name: c.name, type: c.type, tax_number: c.tax_number || '', tax_office: c.tax_office || '', phone: c.phone || '', email: c.email || '', address: c.address || '' }); setModal(true) }
+  const openEdit = (c, e) => { e.stopPropagation(); setEditItem(c); setForm({ name: c.name, type: c.type, tax_number: c.tax_number || '', tax_office: c.tax_office || '', phone: c.phone || '', email: c.email || '', address: c.address || '' }); setModal(true) }
 
   const save = async () => {
     if (!form.name) return
@@ -760,6 +788,13 @@ function ContactsPage({ company, fmt, C }) {
   const filtered = filter === 'all' ? contacts : contacts.filter(c => c.type === filter)
   const typeLabel = { customer: 'Müşteri', supplier: 'Tedarikçi', subcontractor: 'Taşeron' }
   const typeColor = { customer: [C.greenBg, C.green], supplier: [C.blueBg, C.blue], subcontractor: [C.amberBg, C.amber] }
+
+  // Hesaplanan bakiye
+  const calcBalance = (txs) => {
+    const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
+    const expense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
+    return income - expense
+  }
 
   return (
     <div>
@@ -783,14 +818,15 @@ function ContactsPage({ company, fmt, C }) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                {['Ad / Unvan','Tür','Vergi No','Telefon','Bakiye',''].map(h => <th key={h} style={{ padding: '10px 16px', color: C.text3, fontSize: '11px', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', fontWeight: '500' }}>{h}</th>)}
+                {['Ad / Unvan','Tür','Vergi No','Telefon','İşlem Geçmişi',''].map(h => <th key={h} style={{ padding: '10px 16px', color: C.text3, fontSize: '11px', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', fontWeight: '500' }}>{h}</th>)}
               </tr>
             </thead>
             <tbody>
               {filtered.map((c, i) => {
                 const [bg, col] = typeColor[c.type] || [C.amberBg, C.amber]
                 return (
-                  <tr key={c.id} style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : 'none' }}
+                  <tr key={c.id} style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : 'none', cursor: 'pointer' }}
+                    onClick={() => openDetail(c)}
                     onMouseEnter={e => e.currentTarget.style.background = C.cream2}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                     <td style={{ padding: '12px 16px' }}>
@@ -800,9 +836,11 @@ function ContactsPage({ company, fmt, C }) {
                     <td style={{ padding: '12px 16px' }}><span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '20px', background: bg, color: col }}>{typeLabel[c.type]}</span></td>
                     <td style={{ padding: '12px 16px', color: C.text2 }}>{c.tax_number ? `${c.tax_number}${c.tax_office ? ` / ${c.tax_office}` : ''}` : '—'}</td>
                     <td style={{ padding: '12px 16px', color: C.text2 }}>{c.phone || '—'}</td>
-                    <td style={{ padding: '12px 16px', fontWeight: '700', color: (c.balance || 0) >= 0 ? C.green : C.red, fontVariantNumeric: 'tabular-nums' }}>{fmt(c.balance || 0)}</td>
                     <td style={{ padding: '12px 16px' }}>
-                      <button onClick={() => openEdit(c)} style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Düzenle</button>
+                      <span style={{ fontSize: '12px', color: C.amber, fontWeight: '600' }}>Geçmişi Gör →</span>
+                    </td>
+                    <td style={{ padding: '12px 16px' }} onClick={e => e.stopPropagation()}>
+                      <button onClick={(e) => openEdit(c, e)} style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Düzenle</button>
                     </td>
                   </tr>
                 )
@@ -812,6 +850,88 @@ function ContactsPage({ company, fmt, C }) {
         )}
       </div>
 
+      {/* CARİ DETAY MODAL */}
+      {detailModal && selectedContact && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(27,46,94,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#FAFAF8', borderRadius: '14px', width: '100%', maxWidth: '720px', maxHeight: '90vh', overflowY: 'auto' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: `1px solid ${C.border}` }}>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: C.dark, margin: 0 }}>{selectedContact.name}</h3>
+                <p style={{ fontSize: '12px', color: C.text3, margin: '3px 0 0' }}>
+                  {typeLabel[selectedContact.type]}
+                  {selectedContact.tax_number && ` · ${selectedContact.tax_number}`}
+                  {selectedContact.phone && ` · ${selectedContact.phone}`}
+                </p>
+              </div>
+              <button onClick={() => setDetailModal(false)} style={{ background: 'none', border: 'none', fontSize: '22px', color: C.text3, cursor: 'pointer' }}>×</button>
+            </div>
+
+            {/* Bakiye özeti */}
+            {!contactTxLoading && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+                {(() => {
+                  const income = contactTxs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
+                  const expense = contactTxs.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
+                  const balance = income - expense
+                  return [
+                    [fmt(income), 'Toplam Gelir', C.green, C.greenBg],
+                    [fmt(expense), 'Toplam Gider', C.red, C.redBg],
+                    [fmt(balance), 'Net Bakiye', balance >= 0 ? C.green : C.red, balance >= 0 ? C.greenBg : C.redBg],
+                  ].map(([val, label, color, bg]) => (
+                    <div key={label} style={{ background: bg, borderRadius: '8px', padding: '12px 14px', border: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: '10px', color: C.text3, marginBottom: '4px', letterSpacing: '0.04em' }}>{label.toUpperCase()}</div>
+                      <div style={{ fontSize: '18px', fontWeight: '800', color, fontVariantNumeric: 'tabular-nums' }}>{val}</div>
+                    </div>
+                  ))
+                })()}
+              </div>
+            )}
+
+            {/* İşlem geçmişi */}
+            <div style={{ padding: '16px 20px' }}>
+              <h4 style={{ fontSize: '13px', fontWeight: '700', color: C.dark, marginBottom: '12px' }}>İşlem Geçmişi</h4>
+              {contactTxLoading ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Yükleniyor...</div>
+              ) : contactTxs.length === 0 ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Bu cariye ait işlem bulunmuyor.</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                      {['Açıklama','Proje','Kategori','Tarih','Tutar'].map(h => (
+                        <th key={h} style={{ padding: '8px 12px', color: C.text3, fontSize: '11px', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', fontWeight: '500' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contactTxs.map((t, i) => (
+                      <tr key={t.id} style={{ borderBottom: i < contactTxs.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                        <td style={{ padding: '10px 12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '22px', height: '22px', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: t.type === 'income' ? C.greenBg : C.redBg, color: t.type === 'income' ? C.green : C.red, fontSize: '12px', flexShrink: 0 }}>{t.type === 'income' ? '↑' : '↓'}</div>
+                            <span style={{ fontWeight: '600', color: C.dark }}>{t.title}</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '10px 12px', color: C.text2 }}>{t.projects?.name || '—'}</td>
+                        <td style={{ padding: '10px 12px' }}>
+                          {t.categories ? <span style={{ fontSize: '11px', padding: '2px 7px', borderRadius: '4px', background: 'rgba(27,46,94,0.08)', color: C.dark2 }}>{t.categories.name}</span> : <span style={{ color: C.text3 }}>—</span>}
+                        </td>
+                        <td style={{ padding: '10px 12px', color: C.text2 }}>{fmtDate(t.date)}</td>
+                        <td style={{ padding: '10px 12px', fontWeight: '700', color: t.type === 'income' ? C.green : C.red, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                          {t.type === 'income' ? '+' : '-'}{fmtAmount(t.amount, t.currency)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FORM MODAL */}
       {modal && (
         <Modal title={editItem ? 'Cariyi Düzenle' : 'Yeni Cari'} onClose={() => setModal(false)} onSave={save} saving={saving} C={C}>
           <FField label="Ad / Unvan *" C={C}><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Ahmet Yılmaz veya ABC Ltd." style={inp(C)}/></FField>
