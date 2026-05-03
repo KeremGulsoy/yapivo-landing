@@ -84,11 +84,28 @@ export default function Dashboard() {
 
   const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/login' }
 
-  if (loading) return (
+if (loading) return (
     <div style={{ minHeight: '100vh', background: C.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Outfit, sans-serif' }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '32px', fontWeight: '800', color: C.cream }}>yap<span style={{ color: C.amber }}>ivo</span></div>
-        <p style={{ color: 'rgba(248,247,244,0.4)', fontSize: '13px', marginTop: '8px' }}>Yükleniyor...</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/* ÇERÇEVELİ LOGO */}
+        <div style={{
+          width: '100px',
+          height: '100px',
+          border: `3px solid ${C.amber}`,
+          borderRadius: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '20px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)'
+        }}>
+          <LogoIcon size={64} variant="dark" />
+        </div>
+        
+        <div style={{ fontSize: '32px', fontWeight: '800', color: C.cream, letterSpacing: '-0.5px' }}>
+          yap<span style={{ color: C.amber }}>ivo</span>
+        </div>
+        <p style={{ color: 'rgba(248,247,244,0.4)', fontSize: '14px', marginTop: '8px', fontWeight: '500' }}>Yükleniyor...</p>
       </div>
     </div>
   )

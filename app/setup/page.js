@@ -108,8 +108,14 @@ export default function Setup() {
   }
 
   if (!user) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#1B2E5E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#F8F7F4', fontFamily: 'Outfit, sans-serif' }}>Yükleniyor...</p>
+    <div style={{ minHeight: '100vh', backgroundColor: '#1B2E5E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Outfit, sans-serif' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ width: '100px', height: '100px', border: `3px solid #E8870A`, borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+          <LogoIcon size={64} variant="dark" />
+        </div>
+        <div style={{ fontSize: '32px', fontWeight: '800', color: '#F8F7F4', letterSpacing: '-0.5px' }}>yap<span style={{ color: '#E8870A' }}>ivo</span></div>
+        <p style={{ color: 'rgba(248,247,244,0.4)', fontSize: '14px', marginTop: '8px', fontWeight: '500' }}>Yükleniyor...</p>
+      </div>
     </div>
   )
 
