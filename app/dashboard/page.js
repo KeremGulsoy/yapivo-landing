@@ -383,9 +383,9 @@ function CategoriesPage({ company, C, isMobile }) {
     setLoading(false)
   }
 
-  const openNew = () => {
+const openNew = () => {
     setEditItem(null)
-    const defaultType = filter === 'currency' ? 'currency' : filter === 'income' ? 'expense'
+    const defaultType = filter === 'currency' ? 'currency' : filter === 'income' ? 'income' : 'expense'
     setForm({ name: '', type: defaultType, color: '#888780' })
     setSelectedCurrencyCode('')
     setErrors({})
