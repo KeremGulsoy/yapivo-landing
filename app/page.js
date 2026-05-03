@@ -35,62 +35,77 @@ export default function Home() {
   const p = prices[billingCycle]
 
   const plans = [
-  {
-    name: 'Başlangıç',
-    price: p.starter,
-    desc: 'Sistemi öğren, temeli kur.',
-    color: C.dark,
-    highlight: false,
-    users: '2 kullanıcı',
-    extra: '₺150/ek kullanıcı',
-    features: [
-      'Sınırsız proje',
-      'Gelir / Gider takibi',
-      'Cari yönetimi',
-      'Personel & Görev yönetimi',
-      'Kategori yönetimi',
-      'Temel raporlar',
-    ],
-    cta: 'Ücretsiz Dene',
-  },
-  {
-    name: 'Profesyonel',
-    price: p.pro,
-    desc: 'Günlük işi keyifli kılan her şey.',
-    color: C.amber,
-    highlight: true,
-    badge: 'En Popüler',
-    users: '5 kullanıcı',
-    extra: '₺120/ek kullanıcı',
-    features: [
-      'Başlangıç\'taki her şey',
-      'Finans / Kasalar & Çek/Senet',
-      'Hakediş yönetimi',
-      'Daire satış modülü',
-      'PDF çıktı',
-      'Gelişmiş raporlar',
-    ],
-    cta: 'Ücretsiz Dene',
-  },
-  {
-    name: 'Kurumsal',
-    price: p.enterprise,
-    desc: 'Büyük firma, tam kontrol.',
-    color: C.dark,
-    highlight: false,
-    users: '15 kullanıcı',
-    extra: '₺100/ek kullanıcı',
-    features: [
-      'Profesyonel\'deki her şey',
-      'Teklif & Sözleşme modülü',
-      'Çoklu şirket (2 firma)',
-      'Sınırsız görev ve belge',
-      'Öncelikli destek (4s SLA)',
-      'Özel onboarding & eğitim',
-    ],
-    cta: 'İletişime Geç',
-  },
-]
+    {
+      name: 'Başlangıç',
+      price: p.starter,
+      desc: 'Sistemi öğren, temeli kur.',
+      color: C.dark,
+      highlight: false,
+      users: '2 kullanıcı',
+      extra: '₺150/ek kullanıcı',
+      features: [
+        { text: 'Sınırsız proje', yes: true },
+        { text: 'Gelir / Gider takibi', yes: true },
+        { text: 'Cari yönetimi', yes: true },
+        { text: 'Personel yönetimi', yes: true },
+        { text: 'Görev yönetimi (proje başına 10)', yes: true },
+        { text: 'Kategori yönetimi', yes: true },
+        { text: 'Temel raporlar', yes: true },
+        { text: 'Finans / Kasalar', yes: false },
+        { text: 'Çek / Senet takibi', yes: false },
+        { text: 'Hakediş yönetimi', yes: false },
+        { text: 'Daire satış modülü', yes: false },
+      ],
+      cta: 'Ücretsiz Dene',
+      ctaStyle: 'outline',
+    },
+    {
+      name: 'Profesyonel',
+      price: p.pro,
+      desc: 'Günlük işi keyifli kılan her şey.',
+      color: C.amber,
+      highlight: true,
+      badge: 'En Popüler',
+      users: '5 kullanıcı',
+      extra: '₺120/ek kullanıcı',
+      features: [
+        { text: 'Başlangıç\'taki her şey', yes: true },
+        { text: 'Sınırsız görev yönetimi', yes: true },
+        { text: 'Finans / Kasalar', yes: true },
+        { text: 'Çek / Senet takibi', yes: true },
+        { text: 'Hakediş yönetimi', yes: true },
+        { text: 'Daire satış modülü', yes: true },
+        { text: 'PDF çıktı (hakediş, teklif)', yes: true },
+        { text: 'Gelişmiş raporlar', yes: true },
+        { text: 'Teklif yönetimi', yes: false },
+        { text: 'Sözleşme modülü', yes: false },
+        { text: 'Çoklu şirket', yes: false },
+      ],
+      cta: 'Ücretsiz Dene',
+      ctaStyle: 'filled',
+    },
+    {
+      name: 'Kurumsal',
+      price: p.enterprise,
+      desc: 'Büyük firma, tam kontrol.',
+      color: C.dark,
+      highlight: false,
+      users: '15 kullanıcı',
+      extra: '₺100/ek kullanıcı',
+      features: [
+        { text: 'Profesyonel\'deki her şey', yes: true },
+        { text: 'Teklif yönetimi', yes: true },
+        { text: 'Sözleşme modülü', yes: true },
+        { text: 'Çoklu şirket (2 firma)', yes: true },
+        { text: 'Sınırsız görev ve belge', yes: true },
+        { text: 'Öncelikli destek (4s SLA)', yes: true },
+        { text: 'Özel onboarding görüşmesi', yes: true },
+        { text: 'Özel eğitim ve kurulum', yes: true },
+      ],
+      cta: 'İletişime Geç',
+      ctaStyle: 'outline',
+    },
+  ]
 
   const features = [
     {
@@ -138,6 +153,22 @@ export default function Home() {
         .fade-up.visible { opacity: 1; transform: translateY(0); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 3px; }
+        @media (max-width: 768px) {
+          .nav-links { display: none !important; }
+          .hero-title { font-size: 40px !important; letter-spacing: -1px !important; }
+          .hero-stats { grid-template-columns: repeat(3,1fr) !important; }
+          .features-grid { grid-template-columns: 1fr !important; }
+          .pricing-grid { grid-template-columns: 1fr !important; }
+          .pricing-card-pro { transform: scale(1) !important; }
+          .why-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
+          .cta-buttons { flex-direction: column !important; align-items: stretch !important; }
+          .mock-dashboard { display: none !important; }
+        }
+        @media (max-width: 480px) {
+          .hero-title { font-size: 30px !important; }
+          .footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       {/* NAV */}
@@ -155,7 +186,7 @@ export default function Home() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            <div style={{ display: 'flex', gap: '24px' }}>
+            <div className="nav-links" style={{ display: 'flex', gap: '24px' }}>
               {[['#ozellikler','Özellikler'],['#fiyatlar','Fiyatlar'],['#hakkimizda','Hakkımızda']].map(([href, label]) => (
                 <a key={href} href={href} style={{ fontSize: '14px', fontWeight: '500', color: C.text2 }}
                   onMouseEnter={e => e.target.style.color = C.amber}
@@ -183,7 +214,7 @@ export default function Home() {
               <span style={{ fontSize: '13px', fontWeight: '600', color: C.amber }}>14 Gün Ücretsiz · Kart Gerekmez</span>
             </div>
 
-            <h1 style={{ fontSize: '64px', fontWeight: '900', lineHeight: '1.05', letterSpacing: '-2px', marginBottom: '24px', color: C.dark }}>
+            <h1 className="hero-title" style={{ fontSize: '64px', fontWeight: '900', lineHeight: '1.05', letterSpacing: '-2px', marginBottom: '24px', color: C.dark }}>
               İnşaatınızın<br/>
               <span style={{ color: C.amber }}>Dijital Defteri</span>
             </h1>
@@ -208,7 +239,7 @@ export default function Home() {
             </div>
 
             {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginTop: '72px', paddingTop: '40px', borderTop: `1px solid ${C.border}` }}>
+            <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginTop: '72px', paddingTop: '40px', borderTop: `1px solid ${C.border}` }}>
               {[['14 Gün','Ücretsiz deneme'],['₺0','Kurulum ücreti'],['2 dk','Kurulum süresi']].map(([val, label]) => (
                 <div key={label} style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '32px', fontWeight: '900', color: C.amber }}>{val}</div>
@@ -234,7 +265,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+          <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
             {features.map((f, i) => (
               <div key={i} style={{ background: C.cream, borderRadius: '12px', padding: '28px', border: `1px solid ${C.border}`, transition: 'box-shadow 0.2s, border-color 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(27,46,94,0.08)'; e.currentTarget.style.borderColor = C.amber }}
@@ -273,9 +304,9 @@ export default function Home() {
           </div>
 
           {/* Paketler */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', alignItems: 'start' }}>
+          <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', alignItems: 'start' }}>
             {plans.map((plan, i) => (
-              <div key={i} style={{
+              <div key={i} className={plan.highlight ? 'pricing-card-pro' : ''} style={{
                 background: plan.highlight ? C.amber : 'rgba(255,255,255,0.05)',
                 borderRadius: '16px',
                 padding: '32px',
@@ -322,9 +353,13 @@ export default function Home() {
                 <div style={{ borderTop: plan.highlight ? '1px solid rgba(27,46,94,0.15)' : '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
                   {plan.features.map((f, j) => (
                     <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '13px', flexShrink: 0, color: plan.highlight ? C.dark : C.amber, fontWeight: '700' }}>✓</span>
-                      <span style={{ fontSize: '13px', color: plan.highlight ? C.dark : 'rgba(248,247,244,0.8)' }}>{f}</span>
-                  </div>
+                      <span style={{ fontSize: '13px', flexShrink: 0, color: f.yes ? (plan.highlight ? C.dark : C.amber) : 'rgba(255,255,255,0.2)', fontWeight: '700' }}>
+                        {f.yes ? '✓' : '—'}
+                      </span>
+                      <span style={{ fontSize: '13px', color: f.yes ? (plan.highlight ? C.dark : 'rgba(248,247,244,0.85)') : 'rgba(255,255,255,0.25)' }}>
+                        {f.text}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -341,7 +376,7 @@ export default function Home() {
       <section id="hakkimizda" ref={addRef} className="fade-up"
         style={{ padding: '80px 24px', background: C.cream }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
+          <div className="why-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
             <div>
               <p style={{ fontSize: '12px', fontWeight: '700', color: C.amber, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>NEDEN YAPIVO</p>
               <h2 style={{ fontSize: '36px', fontWeight: '900', letterSpacing: '-1px', color: C.dark, marginBottom: '20px', lineHeight: '1.1' }}>
@@ -369,7 +404,7 @@ export default function Home() {
             </div>
 
             {/* Sağ — Mock dashboard kartı */}
-            <div style={{ background: C.dark, borderRadius: '16px', padding: '24px' }}>
+            <div className="mock-dashboard" style={{ background: C.dark, borderRadius: '16px', padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <div style={{ width: '24px', height: '24px', background: C.amber, borderRadius: '6px' }}/>
@@ -436,7 +471,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{ background: C.dark, padding: '48px 24px', borderTop: `1px solid rgba(255,255,255,0.06)` }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
+          <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                 <div style={{ width: '28px', height: '28px', background: C.amber, borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
