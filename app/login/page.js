@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 
+
 export default function Login() {
   const [mode, setMode] = useState('login')
   const [email, setEmail] = useState('')
@@ -145,13 +146,17 @@ export default function Login() {
               width: '44px', height: '44px', backgroundColor: '#E8870A',
               borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
-              <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
-                <line x1="8" y1="8" x2="20" y2="22" stroke="#1B2E5E" strokeWidth="3.5" strokeLinecap="round"/>
-                <line x1="32" y1="8" x2="20" y2="22" stroke="#1B2E5E" strokeWidth="3.5" strokeLinecap="round"/>
-                <line x1="20" y1="22" x2="20" y2="36" stroke="#1B2E5E" strokeWidth="3.5" strokeLinecap="round"/>
-                <rect x="13" y="27" width="5" height="5" fill="#F8F7F4" rx="1"/>
-                <rect x="22" y="27" width="5" height="5" fill="#F8F7F4" rx="1"/>
-              </svg>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
+            {/* YENİ AKILLI LOGO */}
+            <LogoIcon size={48} variant="dark" />
+            
+            <div style={{ fontSize: '28px', fontWeight: '900', color: '#F8F7F4', marginTop: '8px' }}>
+              yap<span style={{ color: '#E8870A' }}>ivo</span>
+            </div>
+            <p style={{ color: 'rgba(248,247,244,0.6)', fontSize: '13px', marginTop: '4px' }}>
+              İnşaatınızın Dijital Defteri
+            </p>
+          </div>
             </div>
             <span style={{ fontSize: '28px', fontWeight: '800', color: '#F8F7F4' }}>
               yap<span style={{ color: '#E8870A' }}>ivo</span>
