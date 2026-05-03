@@ -30,7 +30,7 @@ export default function SplashScreen() {
     <div style={{
       position: 'fixed',
       inset: 0,
-      backgroundColor: '#1B2E5E', // C.dark
+      backgroundColor: '#1B2E5E',
       zIndex: 9999,
       display: 'flex',
       flexDirection: 'column',
@@ -41,7 +41,6 @@ export default function SplashScreen() {
       fontFamily: 'Outfit, sans-serif'
     }}>
       
-      {/* YENİ LOGOMUZ BURADA KOCAMAN DURUYOR */}
       <div style={{ 
         transform: fade ? 'scale(0.95)' : 'scale(1)', 
         transition: 'transform 0.5s ease-in-out',
@@ -49,9 +48,23 @@ export default function SplashScreen() {
         flexDirection: 'column',
         alignItems: 'center'
       }}>
-        <LogoIcon size={80} variant="dark" />
         
-        <div style={{ fontSize: '42px', fontWeight: '900', color: '#F8F7F4', marginTop: '16px', letterSpacing: '-0.5px' }}>
+        {/* ÇERÇEVELİ LOGO (OUTLINE APP ICON) */}
+        <div style={{
+          width: '120px',
+          height: '120px',
+          border: '4px solid #E8870A', // Amber Çerçeve
+          borderRadius: '28px', // Mobil uygulama ikonu kıvrımı
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '20px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)' // Hafif bir derinlik
+        }}>
+          <LogoIcon size={76} variant="dark" />
+        </div>
+        
+        <div style={{ fontSize: '42px', fontWeight: '900', color: '#F8F7F4', letterSpacing: '-0.5px' }}>
           yap<span style={{ color: '#E8870A' }}>ivo</span>
         </div>
         
