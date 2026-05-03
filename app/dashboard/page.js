@@ -9,6 +9,8 @@ import {
   ScrollTable, thStyle, thRight, tdNum, validate
 } from './shared'
 import ProjectsPage from './components/ProjectsPage'
+import TransactionsPage from './components/TransactionsPage'
+import ContactsPage from './components/ContactsPage'
 
 // ══════════════════════════════════════════
 // ANA DASHBOARD
