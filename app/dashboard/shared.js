@@ -233,3 +233,26 @@ export function validate(rules, form) {
   }
   return errors
 }
+
+// ── YEPYENİ AKILLI LOGO BİLEŞENİ ──
+export function LogoIcon({ size = 32, variant = 'dark' }) {
+  // variant = 'dark' -> Karanlık zeminler için (Sidebar, Footer). Çizgiler BEYAZ.
+  // variant = 'light' -> Açık zeminler için (Header). Çizgiler LACİVERT.
+  const mainColor = variant === 'dark' ? '#F8F7F4' : '#1B2E5E'
+  const popColor = '#E8870A' // Turuncu renk sabittir
+  
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+      {/* Sol Çapraz Kiriş */}
+      <line x1="11" y1="10" x2="20" y2="23" stroke={mainColor} strokeWidth="4.5" strokeLinecap="round"/>
+      {/* Sağ Çapraz Kiriş */}
+      <line x1="29" y1="10" x2="20" y2="23" stroke={popColor} strokeWidth="4.5" strokeLinecap="round"/>
+      {/* Dikey Kiriş */}
+      <line x1="20" y1="23" x2="20" y2="34" stroke={mainColor} strokeWidth="4.5" strokeLinecap="round"/>
+      
+      {/* İskele Bağlantı Cıvataları / Kelepçeleri */}
+      <rect x="13.5" y="26" width="5" height="4" rx="1.5" fill={popColor} />
+      <rect x="21.5" y="26" width="5" height="4" rx="1.5" fill={popColor} />
+    </svg>
+  )
+}

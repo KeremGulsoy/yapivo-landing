@@ -6,8 +6,9 @@ import {
   C, CURRENCY_META, AVAILABLE_CURRENCIES, DEFAULT_CURRENCY_CODES,
   fmtAmount, fmt, fmtDate, navGroups, useIsMobile,
   NumberInput, FilterBar, PrimaryBtn, Modal, FRow, FField, inp,
-  ScrollTable, thStyle, thRight, tdNum, validate
+  ScrollTable, thStyle, thRight, tdNum, validate, LogoIcon
 } from './shared'
+
 import ProjectsPage from './components/ProjectsPage'
 import TransactionsPage from './components/TransactionsPage'
 import ContactsPage from './components/ContactsPage'
@@ -113,15 +114,13 @@ export default function Dashboard() {
         top: 0, left: 0, bottom: 0,
         transform: isMobile ? (sidebarOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
       }}>
+        
+        {/* LOGO KISMI BURADA GÜNCELLENDİ */}
         <div style={{ padding: '18px 14px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', flexShrink: 0 }}
           onClick={() => isMobile ? setSidebarOpen(false) : setSidebarCollapsed(!sidebarCollapsed)}>
-          <div style={{ width: '30px', height: '30px', background: C.amber, borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <svg width="17" height="17" viewBox="0 0 40 40" fill="none">
-              <line x1="8" y1="8" x2="20" y2="22" stroke={C.dark} strokeWidth="4" strokeLinecap="round"/>
-              <line x1="32" y1="8" x2="20" y2="22" stroke={C.dark} strokeWidth="4" strokeLinecap="round"/>
-              <line x1="20" y1="22" x2="20" y2="36" stroke={C.dark} strokeWidth="4" strokeLinecap="round"/>
-            </svg>
-          </div>
+          
+          <LogoIcon size={32} variant="dark" />
+          
           {(!sidebarCollapsed || isMobile) && (
             <div>
               <div style={{ fontSize: '15px', fontWeight: '800', color: C.cream, whiteSpace: 'nowrap' }}>yap<span style={{ color: C.amber }}>ivo</span></div>

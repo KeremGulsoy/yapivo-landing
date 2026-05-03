@@ -77,3 +77,24 @@ button {
 .scroll-fade.visible {
   opacity: 1;
 }
+
+/* ÖZEL SCROLLBAR TASARIMI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F0EEE9; /* C.cream2 rengi */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A4580; /* C.dark2 rengi */
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E8870A; /* C.amber rengi */
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { LogoIcon } from './dashboard/shared'
 
 const C = {
   dark: '#1B2E5E',
@@ -142,46 +143,13 @@ export default function Home() {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Outfit', sans-serif; background: ${C.cream}; color: ${C.dark}; }
-        a { text-decoration: none; color: inherit; }
-        button { font-family: 'Outfit', sans-serif; cursor: pointer; }
-        .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .fade-up.visible { opacity: 1; transform: translateY(0); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 3px; }
-        @media (max-width: 768px) {
-          .nav-links { display: none !important; }
-          .hero-title { font-size: 40px !important; letter-spacing: -1px !important; }
-          .hero-stats { grid-template-columns: repeat(3,1fr) !important; }
-          .features-grid { grid-template-columns: 1fr !important; }
-          .pricing-grid { grid-template-columns: 1fr !important; }
-          .pricing-card-pro { transform: scale(1) !important; }
-          .why-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
-          .cta-buttons { flex-direction: column !important; align-items: stretch !important; }
-          .mock-dashboard { display: none !important; }
-        }
-        @media (max-width: 480px) {
-          .hero-title { font-size: 30px !important; }
-          .footer-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-
       {/* NAV */}
       <header style={{ position: 'fixed', top: 0, width: '100%', background: 'rgba(248,247,244,0.85)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}`, zIndex: 100 }}>
         <nav style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          
+          {/* HEADER LOGO */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '30px', height: '30px', background: C.dark, borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="17" height="17" viewBox="0 0 40 40" fill="none">
-                <line x1="8" y1="8" x2="20" y2="22" stroke="#F8F7F4" strokeWidth="4" strokeLinecap="round"/>
-                <line x1="32" y1="8" x2="20" y2="22" stroke="#E8870A" strokeWidth="4" strokeLinecap="round"/>
-                <line x1="20" y1="22" x2="20" y2="36" stroke="#F8F7F4" strokeWidth="4" strokeLinecap="round"/>
-              </svg>
-            </div>
+            <LogoIcon size={30} variant="light" />
             <span style={{ fontSize: '18px', fontWeight: '800' }}>yap<span style={{ color: C.amber }}>ivo</span></span>
           </div>
 
@@ -331,7 +299,6 @@ export default function Home() {
                   {billingCycle === 'yearly' && <div style={{ fontSize: '11px', color: plan.highlight ? 'rgba(27,46,94,0.5)' : 'rgba(248,247,244,0.35)', marginTop: '2px' }}>yıllık faturalandırılır</div>}
                 </div>
 
-                {/* Kullanıcı bilgisi */}
                 <div style={{ background: plan.highlight ? 'rgba(27,46,94,0.1)' : 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px 14px', marginBottom: '20px' }}>
                   <div style={{ fontSize: '13px', fontWeight: '600', color: plan.highlight ? C.dark : '#F8F7F4' }}>{plan.users}</div>
                   <div style={{ fontSize: '11px', color: plan.highlight ? 'rgba(27,46,94,0.5)' : 'rgba(248,247,244,0.4)', marginTop: '2px' }}>{plan.extra}</div>
@@ -403,11 +370,11 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Sağ — Mock dashboard kartı */}
             <div className="mock-dashboard" style={{ background: C.dark, borderRadius: '16px', padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '24px', height: '24px', background: C.amber, borderRadius: '6px' }}/>
+                  {/* KÜÇÜK MOCKUP LOGOSU */}
+                  <LogoIcon size={24} variant="dark" />
                   <span style={{ fontSize: '14px', fontWeight: '700', color: '#F8F7F4' }}>yap<span style={{ color: C.amber }}>ivo</span></span>
                 </div>
                 <span style={{ fontSize: '11px', color: 'rgba(248,247,244,0.3)' }}>Dashboard</span>
@@ -473,16 +440,13 @@ export default function Home() {
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
             <div>
+              
+              {/* FOOTER LOGO */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                <div style={{ width: '28px', height: '28px', background: C.amber, borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="16" height="16" viewBox="0 0 40 40" fill="none">
-                    <line x1="8" y1="8" x2="20" y2="22" stroke="#1B2E5E" strokeWidth="4" strokeLinecap="round"/>
-                    <line x1="32" y1="8" x2="20" y2="22" stroke="#1B2E5E" strokeWidth="4" strokeLinecap="round"/>
-                    <line x1="20" y1="22" x2="20" y2="36" stroke="#1B2E5E" strokeWidth="4" strokeLinecap="round"/>
-                  </svg>
-                </div>
+                <LogoIcon size={32} variant="dark" />
                 <span style={{ fontSize: '17px', fontWeight: '800', color: '#F8F7F4' }}>yap<span style={{ color: C.amber }}>ivo</span></span>
               </div>
+
               <p style={{ fontSize: '13px', color: 'rgba(248,247,244,0.4)', lineHeight: '1.6', maxWidth: '220px' }}>
                 İnşaatınızın Dijital Defteri. Müteahhitler için, müteahhitler tarafından.
               </p>
