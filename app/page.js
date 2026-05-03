@@ -40,9 +40,11 @@ export default function Home() {
       <header style={{ position: 'fixed', top: 0, width: '100%', background: C.dark, borderBottom: `1px solid rgba(255,255,255,0.1)`, zIndex: 100 }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           
-          {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => window.scrollTo(0,0)}>
-            <LogoIcon size={32} variant="light" />
+          {/* Logo - Çerçeveli */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.scrollTo(0,0)}>
+            <div style={{ width: '38px', height: '38px', border: `2px solid ${C.amber}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <LogoIcon size={24} variant="light" />
+            </div>
             <span style={{ fontSize: '24px', fontWeight: '900', color: C.cream }}>yap<span style={{ color: C.amber }}>ivo</span></span>
           </div>
 
@@ -234,9 +236,12 @@ export default function Home() {
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '48px', justifyContent: 'space-between' }}>
           
           <div style={{ flex: '1 1 300px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <LogoIcon size={28} variant="light" />
-              <span style={{ fontSize: '20px', fontWeight: '900', color: C.cream }}>yap<span style={{ color: C.amber }}>ivo</span></span>
+            {/* Logo - Çerçeveli */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '36px', height: '36px', border: `2px solid ${C.amber}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <LogoIcon size={22} variant="light" />
+              </div>
+              <span style={{ fontSize: '22px', fontWeight: '900', color: C.cream }}>yap<span style={{ color: C.amber }}>ivo</span></span>
             </div>
             <p style={{ color: 'rgba(248,247,244,0.6)', fontSize: '14px', lineHeight: '1.6' }}>
               Müteahhitler, taşeronlar ve yapı firmaları için özel olarak tasarlanmış, bulut tabanlı yeni nesil inşaat finans ve yönetim platformu.
@@ -264,7 +269,7 @@ export default function Home() {
         </div>
         
         <div style={{ maxWidth: '1200px', margin: '48px auto 0 auto', paddingTop: '24px', borderTop: `1px solid rgba(255,255,255,0.1)`, textAlign: 'center', color: 'rgba(248,247,244,0.4)', fontSize: '13px' }}>
-          © 2024 Yapivo Yazılım Teknolojileri. Tüm hakları saklıdır.
+          © {new Date().getFullYear()} Yapivo Yazılım Teknolojileri. Tüm hakları saklıdır.
         </div>
       </footer>
     </>
