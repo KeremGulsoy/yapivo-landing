@@ -14,11 +14,49 @@ const C = {
 
 // Para birimi meta verisi — kategorilerden gelen kod ile eşleştirilir
 const CURRENCY_META = {
-  TRY:  { symbol: '₺',  label: 'Türk Lirası',      decimals: 0 },
-  USD:  { symbol: '$',  label: 'Amerikan Doları',   decimals: 2 },
-  EUR:  { symbol: '€',  label: 'Euro',              decimals: 2 },
-  GOLD: { symbol: 'gr', label: 'Altın',             decimals: 3 },
+  TRY:  { symbol: '₺',  label: 'Türk Lirası',        decimals: 0 },
+  USD:  { symbol: '$',  label: 'Amerikan Doları',     decimals: 2 },
+  EUR:  { symbol: '€',  label: 'Euro',                decimals: 2 },
+  GBP:  { symbol: '£',  label: 'İngiliz Sterlini',   decimals: 2 },
+  CHF:  { symbol: 'Fr', label: 'İsviçre Frangı',     decimals: 2 },
+  JPY:  { symbol: '¥',  label: 'Japon Yeni',          decimals: 0 },
+  AED:  { symbol: 'د.إ',label: 'BAE Dirhemi',         decimals: 2 },
+  SAR:  { symbol: '﷼',  label: 'Suudi Riyali',        decimals: 2 },
+  CAD:  { symbol: 'C$', label: 'Kanada Doları',       decimals: 2 },
+  AUD:  { symbol: 'A$', label: 'Avustralya Doları',   decimals: 2 },
+  CNY:  { symbol: '¥',  label: 'Çin Yuanı',           decimals: 2 },
+  RUB:  { symbol: '₽',  label: 'Rus Rublesi',         decimals: 2 },
+  DKK:  { symbol: 'kr', label: 'Danimarka Kronu',     decimals: 2 },
+  NOK:  { symbol: 'kr', label: 'Norveç Kronu',        decimals: 2 },
+  SEK:  { symbol: 'kr', label: 'İsveç Kronu',         decimals: 2 },
+  KWD:  { symbol: 'د.ك',label: 'Kuveyt Dinarı',       decimals: 3 },
+  QAR:  { symbol: 'ر.ق',label: 'Katar Riyali',        decimals: 2 },
+  RON:  { symbol: 'lei',label: 'Romen Leyi',          decimals: 2 },
+  BGN:  { symbol: 'лв', label: 'Bulgar Levası',       decimals: 2 },
+  GOLD:      { symbol: 'gr', label: 'Altın',          decimals: 3 },
+  SILVER:    { symbol: 'gr', label: 'Gümüş',          decimals: 3 },
+  PLATINUM:  { symbol: 'gr', label: 'Platin',         decimals: 3 },
+  PALLADIUM: { symbol: 'gr', label: 'Paladyum',       decimals: 3 },
 }
+
+// Kullanıcıya sunulacak tüm seçenekler
+const AVAILABLE_CURRENCIES = [
+  { group: 'Ana Para Birimleri', items: [
+    { code: 'TRY' }, { code: 'USD' }, { code: 'EUR' }, { code: 'GBP' },
+    { code: 'CHF' }, { code: 'JPY' }, { code: 'CAD' }, { code: 'AUD' },
+  ]},
+  { group: 'Orta Doğu & Asya', items: [
+    { code: 'AED' }, { code: 'SAR' }, { code: 'KWD' }, { code: 'QAR' },
+    { code: 'CNY' }, { code: 'RUB' },
+  ]},
+  { group: 'Avrupa', items: [
+    { code: 'DKK' }, { code: 'NOK' }, { code: 'SEK' }, { code: 'RON' }, { code: 'BGN' },
+  ]},
+  { group: 'Değerli Madenler', items: [
+    { code: 'GOLD' }, { code: 'SILVER' }, { code: 'PLATINUM' }, { code: 'PALLADIUM' },
+  ]},
+]
+
 const DEFAULT_CURRENCY_CODES = ['TRY','USD','EUR','GOLD']
 
 const getCurrencySymbol = (code) => CURRENCY_META[code]?.symbol || code
@@ -339,7 +377,7 @@ export default function Dashboard() {
                 return (
                   <button key={item.id} onClick={() => handleMenuClick(item.id)}
                     title={sidebarCollapsed && !isMobile ? item.label : undefined}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 10px', borderRadius: '7px', border: `1px solid ${isActive ? 'rgba(232,135,10,0.25)' : 'transparent'}`, cursor: 'pointer', marginBottom: '1px', backgroundColor: isActive ? C.amberBg : 'transparent', color: isActive ? C.amber : 'rgba(248,247,244,0.55)', fontFamily: 'Outfit, sans-serif', transition: 'all 0.12s' }}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 10px', borderRadius: '7px', border: `1px solid ${isActive ? 'rgba(232,135,10,0.25)' : 'transparent'}`, cursor: 'pointer', marginBottom: '1px', backgroundColor: isActive ? C.amberBg : 'transparent', color: isActive ? C.amber : 'rgba(248,247,244,0.55)', fontFamily: 'Outfit, sans-serif', transition: 'all 0.12s', textAlign: 'left' }}
                     onMouseEnter={e => { if (!isActive) { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = C.cream } }}
                     onMouseLeave={e => { if (!isActive) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'rgba(248,247,244,0.55)' } }}>
                     <span style={{ fontSize: '16px', flexShrink: 0, width: '18px', textAlign: 'center' }}>{item.icon}</span>
@@ -543,6 +581,248 @@ function DashboardHome({ stats, projects, transactions, cheques, fmt, fmtDate, C
 // KATEGORİLER (para birimleri dahil)
 // ══════════════════════════════════════════
 function CategoriesPage({ company, C, isMobile }) {
+  const [cats, setCats] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [modal, setModal] = useState(false)
+  const [editItem, setEditItem] = useState(null)
+  const [filter, setFilter] = useState('all')
+  const [form, setForm] = useState({ name: '', type: 'expense', color: '#888780' })
+  const [selectedCurrencyCode, setSelectedCurrencyCode] = useState('')
+  const [errors, setErrors] = useState({})
+  const [saving, setSaving] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
+  useEffect(() => {
+    if (!company) return
+    loadCats()
+  }, [company])
+
+  const loadCats = async () => {
+    const { data } = await supabase.from('categories').select('*').eq('company_id', company.id).order('order_index')
+    const all = data || []
+    const hasCurrency = all.some(c => c.type === 'currency')
+    if (!hasCurrency) {
+      const currencies = DEFAULT_CURRENCY_CODES.map((code, i) => ({
+        company_id: company.id, name: code, type: 'currency',
+        color: ['#E8870A','#15803d','#2A4580','#b45309'][i], order_index: i + 1, is_active: true
+      }))
+      const { data: inserted } = await supabase.from('categories').insert(currencies).select()
+      setCats([...all, ...(inserted || [])])
+    } else {
+      setCats(all)
+    }
+    setLoading(false)
+  }
+
+  const openNew = () => {
+    setEditItem(null)
+    const defaultType = filter === 'currency' ? 'currency' : filter === 'income' ? 'income' : 'expense'
+    setForm({ name: '', type: defaultType, color: '#888780' })
+    setSelectedCurrencyCode('')
+    setErrors({})
+    setModal(true)
+  }
+
+  const openEdit = (c) => {
+    setEditItem(c)
+    setForm({ name: c.name, type: c.type, color: c.color || '#888780' })
+    setSelectedCurrencyCode(c.type === 'currency' ? c.name : '')
+    setErrors({})
+    setModal(true)
+  }
+
+  const save = async () => {
+    if (form.type === 'currency') {
+      if (!selectedCurrencyCode) { setErrors({ currency: 'Para birimi seçiniz' }); return }
+      // Zaten ekli mi?
+      const alreadyExists = cats.some(c => c.type === 'currency' && c.name === selectedCurrencyCode && c.id !== editItem?.id)
+      if (alreadyExists) { setErrors({ currency: 'Bu para birimi zaten eklenmiş' }); return }
+    } else {
+      const errs = validate({ name: { required: true, message: 'Kategori adı zorunludur' } }, form)
+      if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    }
+    setSaving(true)
+    const name = form.type === 'currency' ? selectedCurrencyCode : form.name
+    const meta = CURRENCY_META[selectedCurrencyCode]
+    const color = form.type === 'currency' ? (meta ? C.amber : '#888780') : form.color
+    const payload = { company_id: company.id, name, type: form.type, color }
+    if (editItem) {
+      const { data } = await supabase.from('categories').update(payload).eq('id', editItem.id).select().single()
+      if (data) setCats(cats.map(c => c.id === editItem.id ? data : c))
+    } else {
+      const { data } = await supabase.from('categories').insert(payload).select().single()
+      if (data) setCats([...cats, data])
+    }
+    setModal(false); setSaving(false)
+  }
+
+  const toggle = async (id, is_active) => {
+    const { data } = await supabase.from('categories').update({ is_active: !is_active }).eq('id', id).select().single()
+    if (data) setCats(cats.map(c => c.id === id ? { ...c, is_active: !is_active } : c))
+  }
+
+  const handleDelete = async (cat) => {
+    setDeleteError('')
+    const { count } = await supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('category_id', cat.id)
+    if (count && count > 0) {
+      setDeleteError(`"${cat.type === 'currency' ? CURRENCY_META[cat.name]?.label || cat.name : cat.name}" kategorisi ${count} işlemde kullanılıyor. Silinemez, pasif yapabilirsiniz.`)
+      return
+    }
+    await supabase.from('categories').delete().eq('id', cat.id)
+    setCats(cats.filter(c => c.id !== cat.id))
+  }
+
+  // Henüz eklenmemiş para birimleri
+  const addedCurrencyCodes = cats.filter(c => c.type === 'currency').map(c => c.name)
+  const availableToAdd = AVAILABLE_CURRENCIES.map(group => ({
+    ...group,
+    items: group.items.filter(item => !addedCurrencyCodes.includes(item.code) || editItem?.name === item.code)
+  })).filter(group => group.items.length > 0)
+
+  const filtered = filter === 'all' ? cats
+    : filter === 'currency' ? cats.filter(c => c.type === 'currency')
+    : cats.filter(c => c.type === filter)
+
+  const getCurrencyDisplayName = (code) => {
+    const meta = CURRENCY_META[code]
+    if (!meta) return code
+    return `${meta.symbol} ${meta.label} (${code})`
+  }
+
+  return (
+    <div>
+      <FilterBar
+        options={[['all','Tümü'],['expense','Gider'],['income','Gelir'],['currency','Para Birimleri']]}
+        value={filter}
+        onChange={setFilter}
+        right={<PrimaryBtn onClick={openNew}>+ Yeni</PrimaryBtn>}
+      />
+
+      {deleteError && (
+        <div style={{ background: C.redBg, border: `1px solid ${C.red}`, borderRadius: '8px', padding: '12px 14px', marginBottom: '12px', fontSize: '13px', color: C.red, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>⚠ {deleteError}</span>
+          <button onClick={() => setDeleteError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.red, fontSize: '18px', lineHeight: 1 }}>×</button>
+        </div>
+      )}
+
+      <div style={{ background: C.cream, borderRadius: '10px', border: `1px solid ${C.border}` }}>
+        {loading ? <div style={{ padding: '40px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Yükleniyor...</div> :
+        filtered.length === 0 ? <div style={{ padding: '40px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Kategori bulunamadı</div> : (
+          <ScrollTable minWidth="400px">
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                <th style={thStyle}>Ad</th>
+                <th style={thStyle}>Tür</th>
+                <th style={thStyle}>Durum</th>
+                <th style={thStyle}/>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((c, i) => {
+                const isCurrency = c.type === 'currency'
+                const displayName = isCurrency ? getCurrencyDisplayName(c.name) : c.name
+                return (
+                  <tr key={c.id} style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${C.border}` : 'none' }}
+                    onMouseEnter={e => e.currentTarget.style.background = C.cream2}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={{ padding: '11px 14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {isCurrency ? (
+                          <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: c.color || C.amberBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>
+                            {CURRENCY_META[c.name]?.symbol || c.name.slice(0,2)}
+                          </div>
+                        ) : (
+                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: c.color || '#888', flexShrink: 0 }}/>
+                        )}
+                        <div>
+                          <div style={{ fontWeight: '600', color: C.dark }}>{displayName}</div>
+                          {isCurrency && <div style={{ fontSize: '11px', color: C.text3 }}>Kod: {c.name}</div>}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '11px 14px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '20px',
+                        background: isCurrency ? 'rgba(27,46,94,0.08)' : c.type==='income' ? C.greenBg : C.redBg,
+                        color: isCurrency ? C.dark2 : c.type==='income' ? C.green : C.red }}>
+                        {isCurrency ? '💱 Para Birimi' : c.type==='income' ? 'Gelir' : 'Gider'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '11px 14px' }}>
+                      <button onClick={() => toggle(c.id, c.is_active)}
+                        style={{ fontSize: '11px', fontWeight: '600', padding: '4px 12px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', transition: 'all 0.15s',
+                          background: c.is_active ? C.greenBg : 'rgba(156,163,175,0.15)',
+                          color: c.is_active ? C.green : C.text3 }}>
+                        {c.is_active ? '● Aktif' : '○ Pasif'}
+                      </button>
+                    </td>
+                    <td style={{ padding: '11px 14px' }}>
+                      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                        <button onClick={() => openEdit(c)} style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Düzenle</button>
+                        {!DEFAULT_CURRENCY_CODES.includes(c.name) && (
+                          <button onClick={() => handleDelete(c)} style={{ fontSize: '12px', color: C.red, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Sil</button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </ScrollTable>
+        )}
+      </div>
+
+      {modal && (
+        <Modal title={editItem ? 'Kategoriyi Düzenle' : 'Yeni Kategori'} onClose={() => setModal(false)} onSave={save} saving={saving} C={C}>
+          <FField label="Tür" C={C}>
+            <select value={form.type} onChange={e => setForm({...form, type: e.target.value})} style={inp(C)}>
+              <option value="expense">Gider Kategorisi</option>
+              <option value="income">Gelir Kategorisi</option>
+              <option value="currency">Para Birimi</option>
+            </select>
+          </FField>
+
+          {form.type === 'currency' ? (
+            <FField label="Para Birimi Seç" required C={C} error={errors.currency}>
+              <select
+                value={selectedCurrencyCode}
+                onChange={e => { setSelectedCurrencyCode(e.target.value); setErrors({}) }}
+                style={inp(C, errors.currency)}>
+                <option value="">-- Seçiniz --</option>
+                {availableToAdd.map(group => (
+                  <optgroup key={group.group} label={group.group}>
+                    {group.items.map(item => {
+                      const meta = CURRENCY_META[item.code] || { symbol: item.code, label: item.code }
+                      return <option key={item.code} value={item.code}>{meta.symbol} {meta.label} ({item.code})</option>
+                    })}
+                  </optgroup>
+                ))}
+              </select>
+              {selectedCurrencyCode && CURRENCY_META[selectedCurrencyCode] && (
+                <div style={{ marginTop: '8px', padding: '10px 12px', background: C.cream2, borderRadius: '8px', fontSize: '13px', color: C.text2 }}>
+                  <strong style={{ color: C.dark }}>{CURRENCY_META[selectedCurrencyCode].symbol}</strong> · {CURRENCY_META[selectedCurrencyCode].label} · {selectedCurrencyCode} · Ondalık: {CURRENCY_META[selectedCurrencyCode].decimals} hane
+                </div>
+              )}
+            </FField>
+          ) : (
+            <>
+              <FField label="Kategori Adı" required C={C} error={errors.name}>
+                <input value={form.name} onChange={e => { setForm({...form, name: e.target.value}); setErrors({...errors, name: ''}) }}
+                  placeholder="Malzeme, İşçilik, Daire Satışı..." style={inp(C, errors.name)}/>
+              </FField>
+              <FField label="Renk" C={C}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <input type="color" value={form.color} onChange={e => setForm({...form, color: e.target.value})}
+                    style={{ width: '48px', height: '36px', borderRadius: '6px', border: `1px solid ${C.border}`, cursor: 'pointer' }}/>
+                  <span style={{ fontSize: '12px', color: C.text3 }}>{form.color}</span>
+                </div>
+              </FField>
+            </>
+          )}
+        </Modal>
+      )}
+    </div>
+  )
+}
   const [cats, setCats] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
@@ -1315,6 +1595,274 @@ function TransactionsPage({ company, fmt, fmtDate, C, isMobile }) {
 // PROJELER
 // ══════════════════════════════════════════
 function ProjectsPage({ company, fmt, fmtDate, C, isMobile }) {
+  const [projects, setProjects] = useState([])
+  const [currencies, setCurrencies] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [modal, setModal] = useState(false)
+  const [detailModal, setDetailModal] = useState(false)
+  const [selectedProject, setSelectedProject] = useState(null)
+  const [projectTxs, setProjectTxs] = useState([])
+  const [projectTxLoading, setProjectTxLoading] = useState(false)
+  const [editItem, setEditItem] = useState(null)
+  const [filter, setFilter] = useState('all')
+  const emptyForm = { name: '', address: '', budget: 0, budget_currency: 'TRY', start_date: '', end_date: '', status: 'active', description: '' }
+  const [form, setForm] = useState(emptyForm)
+  const [errors, setErrors] = useState({})
+  const [saving, setSaving] = useState(false)
+  const [mapAddress, setMapAddress] = useState('')
+  const mapTimer = useRef(null)
+
+  useEffect(() => {
+    if (!company) return
+    Promise.all([
+      supabase.from('projects').select('*').eq('company_id', company.id).order('created_at', { ascending: false }),
+      supabase.from('categories').select('name').eq('company_id', company.id).eq('type', 'currency').eq('is_active', true),
+    ]).then(([p, cur]) => {
+      setProjects(p.data || [])
+      setCurrencies(cur.data?.map(c => c.name) || DEFAULT_CURRENCY_CODES)
+      setLoading(false)
+    })
+  }, [company])
+
+  const openDetail = async (p) => {
+    setSelectedProject(p); setDetailModal(true); setProjectTxLoading(true)
+    const { data } = await supabase.from('transactions').select('*, categories(name), contacts(name)').eq('company_id', company.id).eq('project_id', p.id).order('date', { ascending: false })
+    setProjectTxs(data || []); setProjectTxLoading(false)
+  }
+  const openNew = () => {
+    setEditItem(null)
+    setForm({ ...emptyForm, budget_currency: currencies[0] || 'TRY' })
+    setErrors({}); setMapAddress(''); setModal(true)
+  }
+  const openEdit = (p, e) => {
+    e?.stopPropagation()
+    setEditItem(p)
+    setForm({ name: p.name, address: p.address||'', budget: p.budget||0, budget_currency: p.budget_currency||'TRY', start_date: p.start_date||'', end_date: p.end_date||'', status: p.status, description: p.description||'' })
+    setErrors({}); setMapAddress(p.address || ''); setModal(true)
+  }
+
+  const handleAddressChange = (val) => {
+    setForm(f => ({ ...f, address: val }))
+    clearTimeout(mapTimer.current)
+    if (val.length > 5) {
+      mapTimer.current = setTimeout(() => setMapAddress(val), 1200)
+    } else {
+      setMapAddress('')
+    }
+  }
+
+  const save = async () => {
+    const errs = validate({ name: { required: true, message: 'Proje adı zorunludur' } }, form)
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    setSaving(true)
+    const payload = { company_id: company.id, name: form.name, address: form.address, budget: Number(form.budget)||0, budget_currency: form.budget_currency, start_date: form.start_date||null, end_date: form.end_date||null, status: form.status, description: form.description }
+    if (editItem) {
+      const { data } = await supabase.from('projects').update(payload).eq('id', editItem.id).select().single()
+      if (data) setProjects(projects.map(p => p.id === editItem.id ? data : p))
+    } else {
+      const { data } = await supabase.from('projects').insert(payload).select().single()
+      if (data) setProjects([data, ...projects])
+    }
+    setModal(false); setSaving(false)
+  }
+
+  const filtered = filter === 'all' ? projects : projects.filter(p => p.status === filter)
+
+  return (
+    <div>
+      <FilterBar
+        options={[['all','Tümü'],['active','Aktif'],['paused','Beklemede'],['completed','Tamamlandı']]}
+        value={filter}
+        onChange={setFilter}
+        right={<PrimaryBtn onClick={openNew}>+ Yeni Proje</PrimaryBtn>}
+      />
+
+      <div style={{ background: C.cream, borderRadius: '10px', border: `1px solid ${C.border}` }}>
+        {loading ? <div style={{ padding: '40px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Yükleniyor...</div> :
+        filtered.length === 0 ? (
+          <div style={{ padding: '60px', textAlign: 'center' }}>
+            <p style={{ color: C.text3, fontSize: '13px', marginBottom: '8px' }}>Proje bulunamadı</p>
+            <span style={{ color: C.amber, fontSize: '12px', fontWeight: '600', cursor: 'pointer' }} onClick={openNew}>+ İlk projeyi ekle</span>
+          </div>
+        ) : (
+          <ScrollTable>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                <th style={thStyle}>Proje</th>
+                {!isMobile && <th style={thStyle}>Adres</th>}
+                <th style={thRight}>Bütçe</th>
+                {!isMobile && <th style={thStyle}>Başlangıç</th>}
+                {!isMobile && <th style={thStyle}>Bitiş</th>}
+                <th style={thStyle}>Durum</th>
+                <th style={thStyle}/><th style={thStyle}/>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((p, i) => {
+                const budgetMeta = CURRENCY_META[p.budget_currency] || CURRENCY_META.TRY
+                return (
+                  <tr key={p.id} style={{ borderBottom: i < filtered.length-1 ? `1px solid ${C.border}` : 'none', cursor: 'pointer' }}
+                    onClick={() => openDetail(p)}
+                    onMouseEnter={e => e.currentTarget.style.background = C.cream2}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={{ padding: '11px 14px' }}>
+                      <div style={{ fontWeight: '700', color: C.dark }}>{p.name}</div>
+                      {p.description && <div style={{ fontSize: '11px', color: C.text3 }}>{p.description.slice(0,30)}</div>}
+                    </td>
+                    {!isMobile && <td style={{ padding: '11px 14px', color: C.text2 }}>{p.address||'—'}</td>}
+                    <td style={tdNum()}>
+                      {budgetMeta.symbol}{new Intl.NumberFormat('tr-TR', { maximumFractionDigits: budgetMeta.decimals }).format(p.budget || 0)}
+                      {p.budget_currency && p.budget_currency !== 'TRY' && <span style={{ fontSize: '10px', color: C.text3, marginLeft: '4px' }}>{p.budget_currency}</span>}
+                    </td>
+                    {!isMobile && <td style={{ padding: '11px 14px', color: C.text2 }}>{fmtDate(p.start_date)}</td>}
+                    {!isMobile && <td style={{ padding: '11px 14px', color: C.text2 }}>{fmtDate(p.end_date)}</td>}
+                    <td style={{ padding: '11px 14px' }}>
+                      <span style={{ fontSize: '10px', fontWeight: '600', padding: '3px 8px', borderRadius: '20px', background: p.status==='active'?C.greenBg:p.status==='completed'?'rgba(27,46,94,0.1)':'rgba(156,163,175,0.12)', color: p.status==='active'?C.green:p.status==='completed'?C.dark:C.text3, whiteSpace: 'nowrap' }}>
+                        {p.status==='active'?'Aktif':p.status==='completed'?'Tamamlandı':'Beklemede'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '11px 14px' }}><span style={{ fontSize: '12px', color: C.amber, fontWeight: '600', whiteSpace: 'nowrap' }}>Detay →</span></td>
+                    <td style={{ padding: '11px 14px' }} onClick={e => e.stopPropagation()}>
+                      <button onClick={(e) => openEdit(p, e)} style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', textAlign: 'left' }}>Düzenle</button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </ScrollTable>
+        )}
+      </div>
+
+      {/* Proje detay modal */}
+      {detailModal && selectedProject && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(27,46,94,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+          <div style={{ background: '#FAFAF8', borderRadius: '14px', width: '100%', maxWidth: '780px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: C.dark, margin: 0 }}>{selectedProject.name}</h3>
+                <p style={{ fontSize: '12px', color: C.text3, margin: '3px 0 0' }}>{selectedProject.address||''} {selectedProject.budget>0?`· Bütçe: ${fmtAmount(selectedProject.budget, selectedProject.budget_currency||'TRY')}`:''}</p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={(e) => { setDetailModal(false); openEdit(selectedProject, e) }}
+                  style={{ fontSize: '12px', color: C.amber, fontWeight: '600', background: 'none', border: `1px solid ${C.amber}`, borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>Düzenle</button>
+                <button onClick={() => setDetailModal(false)} style={{ background: 'none', border: 'none', fontSize: '22px', color: C.text3, cursor: 'pointer' }}>×</button>
+              </div>
+            </div>
+            {!projectTxLoading && (
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile?'repeat(2,1fr)':'repeat(4,1fr)', gap: '10px', padding: '14px 20px', borderBottom: `1px solid ${C.border}` }}>
+                {(() => {
+                  const income = projectTxs.filter(t => t.type==='income').reduce((s,t) => s+Number(t.amount), 0)
+                  const expense = projectTxs.filter(t => t.type==='expense').reduce((s,t) => s+Number(t.amount), 0)
+                  const net = income - expense
+                  const budget = selectedProject.budget || 0
+                  const budgetUsed = budget > 0 ? Math.round((expense/budget)*100) : null
+                  return [
+                    [fmt(income),'Toplam Gelir',C.green,C.greenBg],
+                    [fmt(expense),'Toplam Gider',C.red,C.redBg],
+                    [fmt(net),'Net Kar/Zarar',net>=0?C.green:C.red,net>=0?C.greenBg:C.redBg],
+                    [budgetUsed!==null?`%${budgetUsed}`:'—','Bütçe Kullanımı',budgetUsed>90?C.red:budgetUsed>70?C.amber:C.dark,C.cream],
+                  ].map(([val,label,color,bg]) => (
+                    <div key={label} style={{ background:bg, borderRadius:'8px', padding:'12px', border:`1px solid ${C.border}` }}>
+                      <div style={{ fontSize:'10px', color:C.text3, marginBottom:'4px', letterSpacing:'0.04em' }}>{label.toUpperCase()}</div>
+                      <div style={{ fontSize:'17px', fontWeight:'800', color, fontVariantNumeric:'tabular-nums' }}>{val}</div>
+                    </div>
+                  ))
+                })()}
+              </div>
+            )}
+
+            {/* Harita */}
+            {selectedProject.address && (
+              <div style={{ padding: '0 20px 14px', borderBottom: `1px solid ${C.border}` }}>
+                <div style={{ marginTop: '14px', borderRadius: '8px', overflow: 'hidden', border: `1px solid ${C.border}` }}>
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(selectedProject.address + ' Türkiye')}&output=embed&hl=tr&z=15`}
+                    width="100%" height="180" style={{ border: 'none', display: 'block' }}
+                    loading="lazy" title="Proje Konumu"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div style={{ padding: '14px 20px' }}>
+              <h4 style={{ fontSize: '13px', fontWeight: '700', color: C.dark, marginBottom: '10px' }}>İşlem Geçmişi</h4>
+              {projectTxLoading ? <div style={{ padding: '30px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Yükleniyor...</div> :
+              projectTxs.length === 0 ? <div style={{ padding: '30px', textAlign: 'center', color: C.text3, fontSize: '13px' }}>Bu projeye ait işlem bulunmuyor.</div> : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '480px' }}>
+                    <thead><tr style={{ borderBottom: `1px solid ${C.border}` }}>{['Açıklama','Cari','Kategori','Tarih','Tutar'].map((h,i)=><th key={h} style={{...thStyle,textAlign:i===4?'right':'left'}}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      {projectTxs.map((t,i) => (
+                        <tr key={t.id} style={{ borderBottom:i<projectTxs.length-1?`1px solid ${C.border}`:'none' }}>
+                          <td style={{ padding:'9px 12px' }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:'7px' }}>
+                              <div style={{ width:'20px', height:'20px', borderRadius:'5px', display:'flex', alignItems:'center', justifyContent:'center', background:t.type==='income'?C.greenBg:C.redBg, color:t.type==='income'?C.green:C.red, fontSize:'11px', flexShrink:0 }}>{t.type==='income'?'↑':'↓'}</div>
+                              <span style={{ fontWeight:'600', color:C.dark }}>{t.title}</span>
+                            </div>
+                          </td>
+                          <td style={{ padding:'9px 12px', color:C.text2 }}>{t.contacts?.name||'—'}</td>
+                          <td style={{ padding:'9px 12px' }}>{t.categories?<span style={{ fontSize:'11px', padding:'2px 6px', borderRadius:'4px', background:'rgba(27,46,94,0.08)', color:C.dark2 }}>{t.categories.name}</span>:<span style={{ color:C.text3 }}>—</span>}</td>
+                          <td style={{ padding:'9px 12px', color:C.text2, whiteSpace:'nowrap' }}>{fmtDate(t.date)}</td>
+                          <td style={tdNum(t.type==='income'?C.green:C.red)}>{t.type==='income'?'+':'-'}{fmtAmount(t.amount,t.currency)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal && (
+        <Modal title={editItem ? 'Projeyi Düzenle' : 'Yeni Proje'} onClose={() => setModal(false)} onSave={save} saving={saving} C={C}>
+          <FField label="Proje Adı" required C={C} error={errors.name}>
+            <input value={form.name} onChange={e => { setForm({...form, name: e.target.value}); setErrors({...errors, name: ''}) }}
+              placeholder="Kadıköy Konut Projesi" style={inp(C, errors.name)}/>
+          </FField>
+          <FRow>
+            <FField label="Durum" C={C}>
+              <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} style={inp(C)}>
+                <option value="active">Aktif</option><option value="paused">Beklemede</option><option value="completed">Tamamlandı</option>
+              </select>
+            </FField>
+            <FField label="Bütçe" C={C}>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <NumberInput value={form.budget} onChange={v => setForm({...form, budget: v})} style={{ ...inp(C), flex: 1 }}/>
+                <select value={form.budget_currency} onChange={e => setForm({...form, budget_currency: e.target.value})} style={{ ...inp(C), width: '90px', flexShrink: 0 }}>
+                  {currencies.map(code => {
+                    const meta = CURRENCY_META[code] || { symbol: code }
+                    return <option key={code} value={code}>{meta.symbol} {code}</option>
+                  })}
+                </select>
+              </div>
+            </FField>
+          </FRow>
+          <FField label="Adres" C={C}>
+            <input value={form.address} onChange={e => handleAddressChange(e.target.value)}
+              placeholder="İstanbul, Kadıköy, Moda Cad. No:1" style={inp(C)}/>
+          </FField>
+          {/* Harita önizleme */}
+          {mapAddress && (
+            <div style={{ marginTop: '-8px', marginBottom: '14px', borderRadius: '8px', overflow: 'hidden', border: `1px solid ${C.border}` }}>
+              <iframe
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(mapAddress + ' Türkiye')}&output=embed&hl=tr&z=15`}
+                width="100%" height="180" style={{ border: 'none', display: 'block' }}
+                loading="lazy" title="Konum"
+              />
+            </div>
+          )}
+          <FRow>
+            <FField label="Başlangıç" C={C}><input type="date" value={form.start_date} onChange={e => setForm({...form, start_date: e.target.value})} style={inp(C)}/></FField>
+            <FField label="Bitiş" C={C}><input type="date" value={form.end_date} onChange={e => setForm({...form, end_date: e.target.value})} style={inp(C)}/></FField>
+          </FRow>
+          <FField label="Açıklama" C={C}><textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Notlar..." rows={3} style={{...inp(C), resize:'vertical'}}/></FField>
+        </Modal>
+      )}
+    </div>
+  )
+}
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
