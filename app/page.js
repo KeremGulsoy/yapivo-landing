@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { LogoIcon } from './dashboard/shared'
+import SplashScreen from './components/SplashScreen'
 
 const C = {
   dark: '#1B2E5E',
