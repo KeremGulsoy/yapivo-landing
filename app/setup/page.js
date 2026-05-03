@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { LogoIcon } from '../dashboard/shared'
 
 export default function Setup() {
   const [user, setUser] = useState(null)
@@ -124,12 +125,15 @@ export default function Setup() {
 
       <div style={{ width: '100%', maxWidth: '480px', position: 'relative', zIndex: 1 }}>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <span style={{ fontSize: '28px', fontWeight: '800', color: '#F8F7F4' }}>
-            yap<span style={{ color: '#E8870A' }}>ivo</span>
-          </span>
-          <p style={{ color: 'rgba(248,247,244,0.45)', fontSize: '13px', marginTop: '6px' }}>
+        {/* LOGO ALANI GÜNCELLENDİ */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <LogoIcon size={46} variant="dark" />
+            <div style={{ fontSize: '36px', fontWeight: '900', color: '#F8F7F4' }}>
+              yap<span style={{ color: '#E8870A' }}>ivo</span>
+            </div>
+          </div>
+          <p style={{ color: 'rgba(248,247,244,0.6)', fontSize: '15px', marginTop: '6px', fontWeight: '500' }}>
             İnşaatınızın Dijital Defteri
           </p>
         </div>
