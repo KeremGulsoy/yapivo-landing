@@ -98,3 +98,12 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: #E8870A; /* C.amber rengi */
 }
+
+/* TARAYICI İNATÇILIĞINI KIRAN FONT KURALLARI */
+html, body {
+  font-family: var(--font-outfit), 'Outfit', sans-serif !important;
+}
+
+input, button, textarea, select {
+  font-family: inherit !important;
+}
