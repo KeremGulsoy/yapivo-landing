@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '../lib/supabase' // Yol farklıysa '../lib/supabase' kısmını kendi projene göre düzelt
+import { supabase } from '../../lib/supabase' // Yol farklıysa '../../lib/supabase' kısmını kendi projene göre düzelt
 import { LogoIcon, C } from '../dashboard/shared'
 
 export default function LoginPage() {
