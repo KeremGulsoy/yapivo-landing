@@ -143,6 +143,9 @@ export default function Home() {
 
   return (
     <>
+      {/* AÇILIŞ EKRANI BURADA! */}
+      <SplashScreen />
+
       {/* NAV */}
       <header style={{ position: 'fixed', top: 0, width: '100%', background: 'rgba(248,247,244,0.85)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}`, zIndex: 100 }}>
         <nav style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
