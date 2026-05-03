@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { LogoIcon } from './dashboard/shared'
-import SplashScreen from './components/SplashScreen'
 import { supabase } from '../../lib/supabase'
 import {
   C, CURRENCY_META, AVAILABLE_CURRENCIES, DEFAULT_CURRENCY_CODES,
