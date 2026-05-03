@@ -1011,8 +1011,7 @@ function CategoriesPage({ company, C, isMobile }) {
           </FField>
           {form.type !== 'currency' && (
             <FField label="Renk" C={C}>
-              <input type="color" value={form.color} onChange={e => setForm({...form, color: e.target.value})
-              } style={{ width: '60px', height: '36px', borderRadius: '6px', border: `1px solid ${C.border}`, cursor: 'pointer' }}/>
+              <input type="color" value={form.color} onChange={e => setForm({...form, color: e.target.value})} style={{ width: '60px', height: '36px', borderRadius: '6px', border: `1px solid ${C.border}`, cursor: 'pointer' }}/>
             </FField>
           )}
         </Modal>
