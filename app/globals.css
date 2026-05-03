@@ -1,105 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
-
-:root {
-  --font-outfit: 'Outfit', sans-serif;
-  --color-dark: #1B2E5E;
-  --color-amber: #E8870A;
-  --color-cream: #F8F7F4;
-  --color-blue: #2A4580;
-}
-
-* {
+html, body {
+  font-family: var(--font-outfit), 'Outfit', sans-serif !important;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
+  background-color: #F8F7F4;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font-outfit);
-  background-color: var(--color-cream);
-  color: var(--color-dark);
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-button {
-  font-family: var(--font-outfit);
-}
-
-/* Custom animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.slide-in-left {
-  animation: slideInLeft 0.6s ease-out forwards;
-}
-
-/* Scroll fade effect */
-.scroll-fade {
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-}
-
-.scroll-fade.visible {
-  opacity: 1;
-}
-
-/* ÖZEL SCROLLBAR TASARIMI */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #F0EEE9; /* C.cream2 rengi */
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #2A4580; /* C.dark2 rengi */
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #E8870A; /* C.amber rengi */
-}
-
-/* TARAYICI İNATÇILIĞINI KIRAN FONT KURALLARI */
-html, body {
-  font-family: var(--font-outfit), 'Outfit', sans-serif !important;
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 input, button, textarea, select {
   font-family: inherit !important;
+}
+
+/* Kaydırma Çubuğu (Scrollbar) Tasarımı */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #B4B2A9; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #E8870A; }
+
+/* --- AŞAĞIDAN SÜZÜLME (FADE-UP) ANİMASYONU --- */
+.fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- MOBİL UYUMLULUK SINIFLARI --- */
+.desktop-only { display: flex; }
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: flex !important; }
+  
+  /* Mobilde fontları biraz küçültelim */
+  .hero-title { font-size: 36px !important; line-height: 1.2 !important; }
+  .section-title { font-size: 28px !important; }
 }
