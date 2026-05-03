@@ -1,307 +1,154 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
+import { useState } from 'react'
+import { supabase } from '../lib/supabase' // Yol farklıysa '../lib/supabase' kısmını kendi projene göre düzelt
+import { LogoIcon, C } from '../dashboard/shared'
 
-
-export default function Login() {
-  const [mode, setMode] = useState('login')
+export default function LoginPage() {
+  const [isLogin, setIsLogin] = useState(true) // true: Giriş Yap, false: Kayıt Ol
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [companyName, setCompanyName] = useState('')
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState(null)
   const [error, setError] = useState(null)
+  const [message, setMessage] = useState(null)
 
-  useEffect(() => {
-    const handleAuth = async () => {
-      const hash = window.location.hash
-      if (hash && hash.includes('access_token')) {
-        await new Promise(r => setTimeout(r, 1000))
-        const { data } = await supabase.auth.getSession()
-        if (data?.session) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('company_id')
-            .eq('id', data.session.user.id)
-            .single()
-          if (profile?.company_id) {
-            window.location.href = '/dashboard'
-          } else {
-            window.location.href = '/setup'
-          }
-          return
-        }
-      }
-
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('id', session.user.id)
-          .single()
-        if (profile?.company_id) {
-          window.location.href = '/dashboard'
-        } else {
-          window.location.href = '/setup'
-        }
-      }
-    }
-
-    handleAuth()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('id', session.user.id)
-          .single()
-        if (profile?.company_id) {
-          window.location.href = '/dashboard'
-        } else {
-          window.location.href = '/setup'
-        }
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const handleLogin = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError('Email veya şifre hatalı.')
-    }
-    setLoading(false)
-  }
+    setMessage(null)
 
-  const handleRegister = async () => {
-    if (!fullName || !companyName || !email || !password) {
-      setError('Tüm alanları doldurun.')
-      return
-    }
-    if (password.length < 6) {
-      setError('Şifre en az 6 karakter olmalı.')
-      return
-    }
-    setLoading(true)
-    setError(null)
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, company_name: companyName }
-      }
-    })
-    if (error) {
-      setError(error.message)
+    if (isLogin) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) setError(error.message)
+      else window.location.href = '/dashboard'
     } else {
-      setMessage('Kayıt başarılı! Email adresinize doğrulama linki gönderildi.')
+      const { error } = await supabase.auth.signUp({ email, password })
+      if (error) setError(error.message)
+      else setMessage('Kayıt başarılı! Lütfen email adresinizi doğrulayın.')
     }
     setLoading(false)
   }
 
-  const handleForgot = async () => {
-    if (!email) { setError('Email adresinizi girin.'); return }
-    setLoading(true)
-    setError(null)
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`
-    })
-    if (error) {
-      setError(error.message)
-    } else {
-      setMessage('Şifre sıfırlama linki emailinize gönderildi.')
-    }
-    setLoading(false)
-  }
-
-  const handleSubmit = () => {
-    if (mode === 'login') handleLogin()
-    else if (mode === 'register') handleRegister()
-    else handleForgot()
+  // Ortak input stili
+  const inputStyle = {
+    width: '100%',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    border: `1px solid ${C.border}`,
+    backgroundColor: 'rgba(27,46,94,0.04)', // Tasarımdaki o hafif mavimsi gri arka plan
+    fontSize: '14px',
+    fontFamily: 'Outfit, sans-serif',
+    outline: 'none',
+    color: C.dark,
+    marginBottom: '16px'
   }
 
   return (
-    <div style={{
-      minHeight: '100vh', backgroundColor: '#1B2E5E',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '24px', fontFamily: 'Outfit, sans-serif'
-    }}>
-      <div style={{
-        position: 'fixed', inset: 0, opacity: 0.03,
-        backgroundImage: 'radial-gradient(circle, #E8870A 1px, transparent 1px)',
-        backgroundSize: '32px 32px'
-      }}/>
-
-      <div style={{ width: '100%', maxWidth: '440px', position: 'relative', zIndex: 1 }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '44px', height: '44px', backgroundColor: '#E8870A',
-              borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
-            {/* YENİ AKILLI LOGO */}
-            <LogoIcon size={48} variant="dark" />
-            
-            <div style={{ fontSize: '28px', fontWeight: '900', color: '#F8F7F4', marginTop: '8px' }}>
-              yap<span style={{ color: '#E8870A' }}>ivo</span>
-            </div>
-            <p style={{ color: 'rgba(248,247,244,0.6)', fontSize: '13px', marginTop: '4px' }}>
-              İnşaatınızın Dijital Defteri
-            </p>
+    <div style={{ minHeight: '100vh', backgroundColor: C.dark, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'Outfit, sans-serif' }}>
+      
+      {/* HEADER & LOGO */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <LogoIcon size={46} variant="dark" />
+          <div style={{ fontSize: '36px', fontWeight: '900', color: '#F8F7F4' }}>
+            yap<span style={{ color: C.amber }}>ivo</span>
           </div>
-            </div>
-            <span style={{ fontSize: '28px', fontWeight: '800', color: '#F8F7F4' }}>
-              yap<span style={{ color: '#E8870A' }}>ivo</span>
-            </span>
-          </div>
-          <p style={{ color: 'rgba(248,247,244,0.45)', fontSize: '13px', marginTop: '8px' }}>
-            İnşaatınızın Dijital Defteri
-          </p>
         </div>
-
-        <div style={{ backgroundColor: '#F8F7F4', borderRadius: '20px', padding: '36px' }}>
-          {mode !== 'forgot' && (
-            <div style={{
-              display: 'flex', backgroundColor: '#E5E0D8',
-              borderRadius: '10px', padding: '4px', marginBottom: '28px'
-            }}>
-              {['login', 'register'].map((m) => (
-                <button key={m} onClick={() => { setMode(m); setError(null); setMessage(null) }}
-                  style={{
-                    flex: 1, padding: '8px', borderRadius: '8px', border: 'none',
-                    cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontSize: '14px',
-                    fontWeight: '600', backgroundColor: mode === m ? '#1B2E5E' : 'transparent',
-                    color: mode === m ? '#F8F7F4' : '#888780'
-                  }}>
-                  {m === 'login' ? 'Giriş Yap' : 'Kayıt Ol'}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#1B2E5E', marginBottom: '6px' }}>
-            {mode === 'login' ? 'Hesabınıza Giriş Yapın' :
-             mode === 'register' ? 'Yeni Hesap Oluşturun' : 'Şifrenizi Sıfırlayın'}
-          </h2>
-          <p style={{ fontSize: '13px', color: '#888780', marginBottom: '24px' }}>
-            {mode === 'login' ? 'Email ve şifrenizle devam edin.' :
-             mode === 'register' ? '14 gün ücretsiz, kart gerekmez.' :
-             'Email adresinize sıfırlama linki göndereceğiz.'}
-          </p>
-
-          {error && (
-            <div style={{
-              backgroundColor: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)',
-              borderRadius: '8px', padding: '12px 14px', marginBottom: '16px',
-              fontSize: '13px', color: '#dc2626'
-            }}>{error}</div>
-          )}
-
-          {message && (
-            <div style={{
-              backgroundColor: 'rgba(21,128,61,0.08)', border: '1px solid rgba(21,128,61,0.2)',
-              borderRadius: '8px', padding: '12px 14px', marginBottom: '16px',
-              fontSize: '13px', color: '#15803d'
-            }}>{message}</div>
-          )}
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {mode === 'register' && (
-              <>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#5F5E5A', display: 'block', marginBottom: '6px' }}>Ad Soyad</label>
-                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ali Yılmaz"
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #E5E0D8', fontSize: '14px', fontFamily: 'Outfit, sans-serif', outline: 'none', backgroundColor: '#fff', color: '#1B2E5E', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#5F5E5A', display: 'block', marginBottom: '6px' }}>Şirket Adı</label>
-                  <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="ABC İnşaat Ltd. Şti."
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #E5E0D8', fontSize: '14px', fontFamily: 'Outfit, sans-serif', outline: 'none', backgroundColor: '#fff', color: '#1B2E5E', boxSizing: 'border-box' }}
-                  />
-                </div>
-              </>
-            )}
-
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: '#5F5E5A', display: 'block', marginBottom: '6px' }}>Email Adresi</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder="ali@sirket.com"
-                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #E5E0D8', fontSize: '14px', fontFamily: 'Outfit, sans-serif', outline: 'none', backgroundColor: '#fff', color: '#1B2E5E', boxSizing: 'border-box' }}
-              />
-            </div>
-
-            {mode !== 'forgot' && (
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: '#5F5E5A', display: 'block', marginBottom: '6px' }}>Şifre</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                  placeholder={mode === 'register' ? 'En az 6 karakter' : '••••••••'}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #E5E0D8', fontSize: '14px', fontFamily: 'Outfit, sans-serif', outline: 'none', backgroundColor: '#fff', color: '#1B2E5E', boxSizing: 'border-box' }}
-                />
-              </div>
-            )}
-          </div>
-
-          {mode === 'login' && (
-            <div style={{ textAlign: 'right', marginTop: '8px' }}>
-              <button onClick={() => { setMode('forgot'); setError(null); setMessage(null) }}
-                style={{ background: 'none', border: 'none', color: '#E8870A', fontSize: '12px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>
-                Şifremi Unuttum
-              </button>
-            </div>
-          )}
-
-          <button onClick={handleSubmit} disabled={loading}
-            style={{
-              width: '100%', padding: '14px', marginTop: '20px',
-              backgroundColor: loading ? '#B4B2A9' : '#E8870A',
-              color: '#1B2E5E', fontWeight: '700', fontSize: '15px',
-              border: 'none', borderRadius: '10px', cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'Outfit, sans-serif'
-            }}>
-            {loading ? 'Lütfen bekleyin...' :
-             mode === 'login' ? 'Giriş Yap →' :
-             mode === 'register' ? 'Hesap Oluştur →' : 'Sıfırlama Linki Gönder →'}
-          </button>
-
-          {mode === 'forgot' && (
-            <button onClick={() => { setMode('login'); setError(null); setMessage(null) }}
-              style={{
-                width: '100%', padding: '12px', marginTop: '10px',
-                backgroundColor: 'transparent', color: '#888780',
-                border: '1.5px solid #E5E0D8', borderRadius: '10px',
-                cursor: 'pointer', fontSize: '14px', fontFamily: 'Outfit, sans-serif'
-              }}>
-              ← Giriş Ekranına Dön
-            </button>
-          )}
-
-          <p style={{ textAlign: 'center', fontSize: '12px', color: '#B4B2A9', marginTop: '20px', lineHeight: '1.6' }}>
-            {mode === 'register' ? 'Kayıt olarak Kullanım Koşulları\'nı kabul etmiş olursunuz.' : 'Hesabınız yok mu? '}
-            {mode === 'login' && (
-              <button onClick={() => setMode('register')}
-                style={{ background: 'none', border: 'none', color: '#E8870A', fontSize: '12px', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: '600' }}>
-                Hemen Kayıt Olun
-              </button>
-            )}
-          </p>
-        </div>
-
-        <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px' }}>
-          <a href="/" style={{ color: 'rgba(248,247,244,0.4)', textDecoration: 'none' }}>← Ana Sayfaya Dön</a>
+        <p style={{ color: 'rgba(248,247,244,0.6)', fontSize: '15px', marginTop: '6px', fontWeight: '500' }}>
+          İnşaatınızın Dijital Defteri
         </p>
+      </div>
+
+      {/* FORM KARTI */}
+      <div style={{ background: C.cream, borderRadius: '16px', width: '100%', maxWidth: '440px', padding: '32px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+        
+        {/* SEKMELER (Giriş / Kayıt) */}
+        <div style={{ display: 'flex', background: 'rgba(27,46,94,0.06)', borderRadius: '10px', padding: '4px', marginBottom: '32px' }}>
+          <button 
+            type="button"
+            onClick={() => { setIsLogin(true); setError(null); setMessage(null) }}
+            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontSize: '14px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s', background: isLogin ? C.dark : 'transparent', color: isLogin ? C.cream : C.text2 }}
+          >
+            Giriş Yap
+          </button>
+          <button 
+            type="button"
+            onClick={() => { setIsLogin(false); setError(null); setMessage(null) }}
+            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontSize: '14px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s', background: !isLogin ? C.dark : 'transparent', color: !isLogin ? C.cream : C.text2 }}
+          >
+            Kayıt Ol
+          </button>
+        </div>
+
+        {/* BAŞLIKLAR */}
+        <h2 style={{ fontSize: '24px', fontWeight: '800', color: C.dark, marginBottom: '6px' }}>
+          {isLogin ? 'Hesabınıza Giriş Yapın' : 'Yeni Hesap Oluşturun'}
+        </h2>
+        <p style={{ fontSize: '14px', color: C.text2, marginBottom: '24px' }}>
+          {isLogin ? 'Email ve şifrenizle devam edin.' : 'Saniyeler içinde Yapivo\'ya katılın.'}
+        </p>
+
+        {/* FORM */}
+        <form onSubmit={handleSubmit}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: C.text2, marginBottom: '6px' }}>Email Adresi</label>
+          <input 
+            type="email" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="ornek@firma.com" 
+            required
+            style={inputStyle} 
+          />
+
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: C.text2, marginBottom: '6px' }}>Şifre</label>
+          <input 
+            type="password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••" 
+            required
+            style={inputStyle} 
+          />
+
+          {isLogin && (
+            <div style={{ textAlign: 'right', marginTop: '-8px', marginBottom: '24px' }}>
+              <a href="#" style={{ fontSize: '13px', fontWeight: '600', color: C.amber, textDecoration: 'none' }}>Şifremi Unuttum</a>
+            </div>
+          )}
+          {!isLogin && <div style={{ height: '24px' }}></div>}
+
+          {/* Hata & Başarı Mesajları */}
+          {error && <div style={{ color: C.red, fontSize: '13px', marginBottom: '16px', background: C.redBg, padding: '10px', borderRadius: '8px' }}>{error}</div>}
+          {message && <div style={{ color: C.green, fontSize: '13px', marginBottom: '16px', background: C.greenBg, padding: '10px', borderRadius: '8px' }}>{message}</div>}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{ width: '100%', background: C.amber, color: C.dark, fontWeight: '800', padding: '14px', borderRadius: '10px', border: 'none', fontSize: '15px', cursor: loading ? 'not-allowed' : 'pointer', transition: 'transform 0.2s', opacity: loading ? 0.7 : 1 }}
+            onMouseEnter={e => { if(!loading) e.currentTarget.style.transform = 'scale(1.02)' }}
+            onMouseLeave={e => { if(!loading) e.currentTarget.style.transform = 'scale(1)' }}
+          >
+            {loading ? 'Bekleniyor...' : (isLogin ? 'Giriş Yap →' : 'Kayıt Ol →')}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: C.text2 }}>
+          {isLogin ? (
+            <>Hesabınız yok mu? <span onClick={() => setIsLogin(false)} style={{ color: C.amber, fontWeight: '700', cursor: 'pointer' }}>Hemen Kayıt Olun</span></>
+          ) : (
+            <>Zaten hesabınız var mı? <span onClick={() => setIsLogin(true)} style={{ color: C.amber, fontWeight: '700', cursor: 'pointer' }}>Giriş Yapın</span></>
+          )}
+        </div>
+      </div>
+
+      {/* GERİ DÖN LİNKİ */}
+      <div style={{ marginTop: '32px' }}>
+        <a href="/" style={{ color: 'rgba(248,247,244,0.5)', fontSize: '14px', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }}
+          onMouseEnter={e => e.target.style.color = C.amber}
+          onMouseLeave={e => e.target.style.color = 'rgba(248,247,244,0.5)'}>
+          ← Ana Sayfaya Dön
+        </a>
       </div>
     </div>
   )
