@@ -184,7 +184,7 @@ export default function Home() {
           {/* Logo Alanı - Amber Çerçeveli */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.scrollTo(0,0)}>
             <div style={{ width: '38px', height: '38px', border: `2px solid ${C.amber}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <LogoIcon size={24} variant="dark" />
+              <LogoIcon size={24} variant="light" />
             </div>
             <span style={{ fontSize: '24px', fontWeight: '900', color: C.dark }}>yap<span style={{ color: C.amber }}>ivo</span></span>
           </div>
@@ -412,7 +412,7 @@ export default function Home() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <div style={{ width: '24px', height: '24px', border: `1.5px solid ${C.amber}`, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                     <LogoIcon size={14} variant="light" />
+                     <LogoIcon size={14} variant="dark" />
                   </div>
                   <span style={{ fontSize: '15px', fontWeight: '800', color: '#F8F7F4' }}>yap<span style={{ color: C.amber }}>ivo</span></span>
                 </div>
