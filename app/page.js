@@ -482,7 +482,7 @@ export default function Home() {
               {/* Logo Alanı - Amber Çerçeveli Koyu Tema */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                 <div style={{ width: '36px', height: '36px', border: `2px solid ${C.amber}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LogoIcon size={22} variant="light" />
+                  <LogoIcon size={22} variant="dark" />
                 </div>
                 <span style={{ fontSize: '22px', fontWeight: '900', color: '#F8F7F4' }}>yap<span style={{ color: C.amber }}>ivo</span></span>
               </div>
