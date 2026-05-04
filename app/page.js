@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LogoIcon } from './dashboard/shared'
 import SplashScreen from './components/SplashScreen'
 
@@ -14,262 +14,509 @@ const C = {
   text3: '#888780',
 }
 
-// Şık SVG İkonlar
-const CheckIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-const FeatureIcon1 = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-const FeatureIcon2 = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-const FeatureIcon3 = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-const MenuIcon = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.cream} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-const CloseIcon = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.cream} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-
 export default function Home() {
-  const [isYearly, setIsYearly] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [billingCycle, setBillingCycle] = useState('monthly') // monthly | yearly
+  const sectionsRef = useRef([])
 
-  const navLinks = [
-    { name: 'Özellikler', href: '#features' },
-    { name: 'Nasıl Çalışır?', href: '#how-it-works' },
-    { name: 'Fiyatlandırma', href: '#pricing' },
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('visible')
+      })
+    }, { threshold: 0.08 })
+    sectionsRef.current.forEach((s) => s && observer.observe(s))
+    return () => observer.disconnect()
+  }, [])
+
+  const addRef = (el) => { if (el && !sectionsRef.current.includes(el)) sectionsRef.current.push(el) }
+
+  // Fiyatlar senin belirlediğin kurumsal formata çekildi
+  const prices = {
+    monthly: { starter: '1.250', pro: '3.000', enterprise: '7.500' },
+    yearly:  { starter: '999', pro: '2.499', enterprise: '5.999' },
+  }
+  const p = prices[billingCycle]
+
+  const plans = [
+    {
+      name: 'Başlangıç',
+      price: p.starter,
+      desc: 'Sistemi öğren, temeli kur.',
+      color: C.dark,
+      highlight: false,
+      users: '2 kullanıcı',
+      extra: '₺150/ek kullanıcı',
+      features: [
+        { text: 'Sınırsız proje', yes: true },
+        { text: 'Gelir / Gider takibi', yes: true },
+        { text: 'Cari yönetimi', yes: true },
+        { text: 'Personel yönetimi', yes: true },
+        { text: 'Görev yönetimi (proje başına 10)', yes: true },
+        { text: 'Kategori yönetimi', yes: true },
+        { text: 'Temel raporlar', yes: true },
+        { text: 'Finans / Kasalar', yes: false },
+        { text: 'Çek / Senet takibi', yes: false },
+        { text: 'Hakediş yönetimi', yes: false },
+        { text: 'Daire satış modülü', yes: false },
+      ],
+      cta: 'Ücretsiz Dene',
+      ctaStyle: 'outline',
+    },
+    {
+      name: 'Profesyonel',
+      price: p.pro,
+      desc: 'Günlük işi keyifli kılan her şey.',
+      color: C.amber,
+      highlight: true,
+      badge: 'En Popüler',
+      users: '5 kullanıcı',
+      extra: '₺120/ek kullanıcı',
+      features: [
+        { text: 'Başlangıç\'taki her şey', yes: true },
+        { text: 'Sınırsız görev yönetimi', yes: true },
+        { text: 'Finans / Kasalar', yes: true },
+        { text: 'Çek / Senet takibi', yes: true },
+        { text: 'Hakediş yönetimi', yes: true },
+        { text: 'Daire satış modülü', yes: true },
+        { text: 'PDF çıktı (hakediş, teklif)', yes: true },
+        { text: 'Gelişmiş raporlar', yes: true },
+        { text: 'Teklif yönetimi', yes: false },
+        { text: 'Sözleşme modülü', yes: false },
+        { text: 'Çoklu şirket', yes: false },
+      ],
+      cta: 'Ücretsiz Dene',
+      ctaStyle: 'filled',
+    },
+    {
+      name: 'Kurumsal',
+      price: p.enterprise,
+      desc: 'Büyük firma, tam kontrol.',
+      color: C.dark,
+      highlight: false,
+      users: '15 kullanıcı',
+      extra: '₺100/ek kullanıcı',
+      features: [
+        { text: 'Profesyonel\'deki her şey', yes: true },
+        { text: 'Teklif yönetimi', yes: true },
+        { text: 'Sözleşme modülü', yes: true },
+        { text: 'Çoklu şirket (2 firma)', yes: true },
+        { text: 'Sınırsız görev ve belge', yes: true },
+        { text: 'Öncelikli destek (4s SLA)', yes: true },
+        { text: 'Özel onboarding görüşmesi', yes: true },
+        { text: 'Özel eğitim ve kurulum', yes: true },
+      ],
+      cta: 'İletişime Geç',
+      ctaStyle: 'outline',
+    },
+  ]
+
+  const features = [
+    {
+      icon: '🏗️',
+      title: 'Proje Yönetimi',
+      desc: 'Her projenizi ayrı yönetin. İlerleme, bütçe, ekip — tek ekranda.',
+    },
+    {
+      icon: '💰',
+      title: 'Gelir & Gider Takibi',
+      desc: 'Her kuruşu kaydedin. Projenin ne kazandırdığını, ne yaktığını görün.',
+    },
+    {
+      icon: '📋',
+      title: 'Görev Yönetimi',
+      desc: 'Saha ekibine görev atayın, teslim tarihi koyun, anlık takip edin.',
+    },
+    {
+      icon: '🏦',
+      title: 'Çek / Senet Takibi',
+      desc: 'Vade yaklaşınca sistem sizi uyarır. Karşılıksız çek sürprizi olmaz.',
+    },
+    {
+      icon: '🏢',
+      title: 'Daire Satış Modülü',
+      desc: 'Hangi daire satıldı, hangisi boş? Müşteri bilgisi ve ödeme planı kayıt altında.',
+    },
+    {
+      icon: '📊',
+      title: 'Hakediş Yönetimi',
+      desc: 'Aylık imalat bazlı tahakkuk. PDF ile müşteriye ilet, ödemeyi takip et.',
+    },
   ]
 
   return (
     <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Outfit', sans-serif; background: ${C.cream}; color: ${C.dark}; }
+        a { text-decoration: none; color: inherit; }
+        button { font-family: 'Outfit', sans-serif; cursor: pointer; }
+        .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 3px; }
+        @media (max-width: 768px) {
+          .nav-links { display: none !important; }
+          .hero-title { font-size: 40px !important; letter-spacing: -1px !important; }
+          .hero-stats { grid-template-columns: repeat(3,1fr) !important; }
+          .features-grid { grid-template-columns: 1fr !important; }
+          .pricing-grid { grid-template-columns: 1fr !important; }
+          .pricing-card-pro { transform: scale(1) !important; }
+          .why-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
+          .cta-buttons { flex-direction: column !important; align-items: stretch !important; }
+          .mock-dashboard { display: none !important; }
+        }
+        @media (max-width: 480px) {
+          .hero-title { font-size: 30px !important; }
+          .footer-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+
+      {/* Açılış Ekranı */}
       <SplashScreen />
 
-      {/* --- NAVBAR (KOYU ARKA PLAN) --- */}
-      <header style={{ position: 'fixed', top: 0, width: '100%', background: C.dark, borderBottom: `1px solid rgba(255,255,255,0.1)`, zIndex: 100 }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* NAV */}
+      <header style={{ position: 'fixed', top: 0, width: '100%', background: 'rgba(248,247,244,0.85)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}`, zIndex: 100 }}>
+        <nav style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           
-          {/* Logo - Çerçeveli */}
+          {/* Logo Alanı - Amber Çerçeveli */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.scrollTo(0,0)}>
             <div style={{ width: '38px', height: '38px', border: `2px solid ${C.amber}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <LogoIcon size={24} variant="dark" />
             </div>
-            <span style={{ fontSize: '24px', fontWeight: '900', color: C.cream }}>yap<span style={{ color: C.amber }}>ivo</span></span>
+            <span style={{ fontSize: '24px', fontWeight: '900', color: C.dark }}>yap<span style={{ color: C.amber }}>ivo</span></span>
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="desktop-only" style={{ alignItems: 'center', gap: '32px' }}>
-            {navLinks.map(link => (
-              <a key={link.name} href={link.href} style={{ color: 'rgba(248,247,244,0.7)', textDecoration: 'none', fontWeight: '500', fontSize: '15px', transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.color = C.amber} onMouseLeave={e => e.target.style.color = 'rgba(248,247,244,0.7)'}>
-                {link.name}
-              </a>
-            ))}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: '32px' }}>
-              <a href="/login" style={{ color: C.cream, textDecoration: 'none', fontWeight: '700', fontSize: '15px', padding: '8px 16px', border: `1px solid ${C.amber}`, borderRadius: '8px', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = C.amber; e.currentTarget.style.color = C.dark; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.cream; }}>
-                Sisteme Giriş Yap
-              </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+            <div className="nav-links" style={{ display: 'flex', gap: '24px' }}>
+              {[['#ozellikler','Özellikler'],['#fiyatlar','Fiyatlar'],['#hakkimizda','Hakkımızda']].map(([href, label]) => (
+                <a key={href} href={href} style={{ fontSize: '15px', fontWeight: '500', color: C.text2 }}
+                  onMouseEnter={e => e.target.style.color = C.amber}
+                  onMouseLeave={e => e.target.style.color = C.text2}>
+                  {label}
+                </a>
+              ))}
             </div>
-          </nav>
-
-          {/* Mobile Nav Button */}
-          <button className="mobile-only" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}>
-            {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && (
-          <div className="mobile-only" style={{ flexDirection: 'column', background: C.dark, borderBottom: `1px solid rgba(255,255,255,0.1)`, padding: '16px 24px', gap: '16px', position: 'absolute', width: '100%', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
-            {navLinks.map(link => (
-              <a key={link.name} href={link.href} onClick={() => setIsMobileMenuOpen(false)} style={{ color: C.cream, textDecoration: 'none', fontWeight: '600', fontSize: '18px', padding: '8px 0', borderBottom: `1px solid rgba(255,255,255,0.1)` }}>{link.name}</a>
-            ))}
-            <a href="/login" style={{ color: C.dark, background: C.amber, textDecoration: 'none', fontWeight: '700', fontSize: '18px', padding: '12px 0', textAlign: 'center', borderRadius: '8px', marginTop: '8px' }}>Sisteme Giriş Yap</a>
+            <a href="/login">
+              <button style={{ background: C.amber, color: C.dark, fontWeight: '700', padding: '9px 22px', borderRadius: '8px', border: 'none', fontSize: '15px' }}>
+                Başla →
+              </button>
+            </a>
           </div>
-        )}
+        </nav>
       </header>
 
-      <main style={{ paddingTop: '73px' }}>
-        
-        {/* --- HERO SECTION (KOYU ARKA PLAN) --- */}
-        <section style={{ background: C.dark, padding: '80px 24px', display: 'flex', alignItems: 'center', minHeight: '60vh' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center', width: '100%' }}>
-            
-            <h1 className="hero-title" style={{ fontSize: '56px', fontWeight: '900', color: C.cream, lineHeight: '1.2', marginBottom: '24px', letterSpacing: '-1px', maxWidth: '800px', margin: '0 auto 24px auto' }}>
-              İnşaatınızın <span style={{ color: C.amber }}>Dijital Defteri.</span>
+      {/* HERO */}
+      <section style={{ paddingTop: '120px', paddingBottom: '80px', paddingLeft: '24px', paddingRight: '24px', minHeight: '90vh', display: 'flex', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
+          <div style={{ maxWidth: '760px', margin: '0 auto', textAlign: 'center' }}>
+
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(232,135,10,0.1)', border: `1px solid rgba(232,135,10,0.25)`, borderRadius: '20px', padding: '6px 16px', marginBottom: '28px' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: C.amber, display: 'inline-block' }}/>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: C.amber }}>14 Gün Ücretsiz · Kart Gerekmez</span>
+            </div>
+
+            <h1 className="hero-title" style={{ fontSize: '64px', fontWeight: '900', lineHeight: '1.05', letterSpacing: '-2px', marginBottom: '24px', color: C.dark }}>
+              İnşaatınızın<br/>
+              <span style={{ color: C.amber }}>Dijital Defteri</span>
             </h1>
-            
-            <p style={{ fontSize: '18px', color: 'rgba(248,247,244,0.7)', lineHeight: '1.6', marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px auto' }}>
-              Karmaşık Excel tablolarından ve WhatsApp gruplarından kurtulun. Çek takibinizi, taşeron hakedişlerinizi ve şantiye maliyetlerinizi tek bir güvenli ekrandan yönetin.
+
+            <p style={{ fontSize: '20px', color: C.text2, lineHeight: '1.6', marginBottom: '40px', maxWidth: '560px', margin: '0 auto 40px' }}>
+              Proje yönetimi, masraf takibi, hakediş, daire satışı. Müteahhitler için, müteahhitler tarafından tasarlandı.
             </p>
-            
-            <div>
-              <a href="/login" style={{ background: C.amber, color: C.dark, padding: '16px 32px', borderRadius: '8px', textDecoration: 'none', fontWeight: '800', fontSize: '18px', display: 'inline-block' }}>
-                14 Gün Ücretsiz Denemeye Başla
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <a href="/login">
+                <button style={{ background: C.amber, color: C.dark, fontWeight: '700', padding: '16px 36px', borderRadius: '10px', border: 'none', fontSize: '16px', transition: 'transform 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
+                  14 Gün Ücretsiz Dene →
+                </button>
+              </a>
+              <a href="#ozellikler">
+                <button style={{ background: 'transparent', color: C.dark, fontWeight: '600', padding: '16px 32px', borderRadius: '10px', border: `2px solid ${C.border}`, fontSize: '16px' }}>
+                  Özellikleri Gör
+                </button>
               </a>
             </div>
-            
-          </div>
-        </section>
 
-        {/* --- NASIL ÇALIŞIR (STATİK VE HİZALI) --- */}
-        <section id="how-it-works" style={{ background: C.cream, padding: '80px 24px' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <h2 className="section-title" style={{ fontSize: '32px', fontWeight: '800', color: C.dark, marginBottom: '16px' }}>Karmaşıklığa Son Veren 3 Adım</h2>
-              <p style={{ fontSize: '16px', color: C.text2 }}>Sistemi kullanmaya başlamak ve rapor almak dakikalar sürer.</p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-              
-              <div style={{ background: '#fff', border: `1px solid ${C.border}`, padding: '32px', borderRadius: '12px' }}>
-                <div style={{ fontSize: '48px', fontWeight: '900', color: 'rgba(232,135,10,0.2)', marginBottom: '16px', lineHeight: '1' }}>01</div>
-                <h3 style={{ fontSize: '20px', fontWeight: '700', color: C.dark, marginBottom: '12px' }}>Şantiyenizi Oluşturun</h3>
-                <p style={{ color: C.text2, fontSize: '15px', lineHeight: '1.6' }}>Sisteme projenizi ekleyin. Başlangıç bütçenizi ve çalışacağınız taşeronları saniyeler içinde sisteme tanımlayın.</p>
-              </div>
-
-              <div style={{ background: '#fff', border: `1px solid ${C.border}`, padding: '32px', borderRadius: '12px' }}>
-                <div style={{ fontSize: '48px', fontWeight: '900', color: 'rgba(232,135,10,0.2)', marginBottom: '16px', lineHeight: '1' }}>02</div>
-                <h3 style={{ fontSize: '20px', fontWeight: '700', color: C.dark, marginBottom: '12px' }}>Verileri Sisteme Girin</h3>
-                <p style={{ color: C.text2, fontSize: '15px', lineHeight: '1.6' }}>Saha ekipleri masrafları, muhasebe birimi çek ve ödemeleri eş zamanlı olarak kendi yetkileri dahilinde girsin.</p>
-              </div>
-
-              <div style={{ background: '#fff', border: `1px solid ${C.border}`, padding: '32px', borderRadius: '12px' }}>
-                <div style={{ fontSize: '48px', fontWeight: '900', color: 'rgba(232,135,10,0.2)', marginBottom: '16px', lineHeight: '1' }}>03</div>
-                <h3 style={{ fontSize: '20px', fontWeight: '700', color: C.dark, marginBottom: '12px' }}>Anlık Raporlar Alın</h3>
-                <p style={{ color: C.text2, fontSize: '15px', lineHeight: '1.6' }}>Bekleyen tahsilatlar, yaklaşan ödemeler ve projenin o anki kar/zarar durumu otomatik olarak önünüze gelsin.</p>
-              </div>
-
-            </div>
-          </div>
-        </section>
-
-        {/* --- ÖZELLİKLER (FEATURES) --- */}
-        <section id="features" style={{ background: C.cream2, padding: '80px 24px' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <h2 className="section-title" style={{ fontSize: '32px', fontWeight: '800', color: C.dark, marginBottom: '16px' }}>Neden Yapivo?</h2>
-              <p style={{ fontSize: '16px', color: C.text2, maxWidth: '600px', margin: '0 auto' }}>Standart muhasebe programlarının aksine, inşaat sektörünün dinamiklerine özel geliştirildi.</p>
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-              {[
-                { icon: <FeatureIcon1 />, title: 'Çoklu Şantiye Yönetimi', desc: 'Farklı illerdeki veya ilçelerdeki şantiyelerinizin kasalarını tek bir merkezden, birbirine karıştırmadan yönetin.' },
-                { icon: <FeatureIcon2 />, title: 'Detaylı Çek Takibi', desc: 'Alınan, verilen veya cirolanan çekleri takip edin. Günü yaklaşan çekler için sistem sizi önceden uyarsın.' },
-                { icon: <FeatureIcon3 />, title: 'Taşeron Hakedişleri', desc: 'Sözleşme bedellerini sisteme girin, yapılan imalatlar üzerinden otomatik hakediş dökümleri oluşturun.' }
-              ].map((f, i) => (
-                <div key={i} style={{ background: '#fff', padding: '32px', borderRadius: '12px', border: `1px solid ${C.border}` }}>
-                  <div style={{ width: '56px', height: '56px', background: 'rgba(232,135,10,0.1)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
-                    {f.icon}
-                  </div>
-                  <h3 style={{ fontSize: '20px', fontWeight: '700', color: C.dark, marginBottom: '12px' }}>{f.title}</h3>
-                  <p style={{ color: C.text2, fontSize: '15px', lineHeight: '1.6' }}>{f.desc}</p>
+            {/* Stats */}
+            <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginTop: '72px', paddingTop: '40px', borderTop: `1px solid ${C.border}` }}>
+              {[['14 Gün','Ücretsiz deneme'],['₺0','Kurulum ücreti'],['2 dk','Kurulum süresi']].map(([val, label]) => (
+                <div key={label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '32px', fontWeight: '900', color: C.amber }}>{val}</div>
+                  <div style={{ fontSize: '13px', color: C.text3, marginTop: '4px' }}>{label}</div>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* --- FIYATLANDIRMA (PRICING) --- */}
-        <section id="pricing" style={{ padding: '80px 24px', background: C.cream }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <h2 className="section-title" style={{ fontSize: '32px', fontWeight: '800', color: C.dark, marginBottom: '16px' }}>Sade ve Şeffaf Fiyatlandırma</h2>
-              <p style={{ fontSize: '16px', color: C.text2 }}>Gizli maliyetler yok. Şirketinizin hacmine uygun paketi seçin.</p>
-            </div>
-
-            {/* Aylık / Yıllık Toggle */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '48px' }}>
-              <span style={{ fontWeight: isYearly ? '500' : '800', color: isYearly ? C.text3 : C.dark, fontSize: '16px' }}>Aylık Ödeme</span>
-              <div onClick={() => setIsYearly(!isYearly)} style={{ width: '56px', height: '30px', background: C.dark, borderRadius: '20px', position: 'relative', cursor: 'pointer' }}>
-                <div style={{ position: 'absolute', top: '3px', left: isYearly ? '29px' : '3px', width: '24px', height: '24px', background: C.amber, borderRadius: '50%', transition: 'left 0.2s' }} />
-              </div>
-              <span style={{ fontWeight: isYearly ? '800' : '500', color: isYearly ? C.dark : C.text3, fontSize: '16px' }}>
-                Yıllık Ödeme <span style={{ color: C.amber, fontSize: '14px', fontWeight: '700' }}>(Avantajlı)</span>
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', alignItems: 'flex-start' }}>
-              {[
-                { 
-                  name: 'Başlangıç', target: 'Küçük İşletmeler', priceM: '1.250', priceY: '999', 
-                  features: ['Cari ve Kasa Takibi', 'Temel Gelir/Gider Yönetimi', '2 Kullanıcı Erişimi', 'E-mail Desteği'] 
-                },
-                { 
-                  name: 'Profesyonel', target: 'Taşeron ve Şantiyeler', priceM: '3.000', priceY: '2.499', isPopular: true,
-                  features: ['Başlangıç\'taki her şey', 'Çek ve Senet Takibi', 'Taşeron Hakedişleri', '5 Kullanıcı Erişimi', 'Öncelikli Destek'] 
-                },
-                { 
-                  name: 'Kurumsal', target: 'Büyük Yapı Firmaları', priceM: '7.500', priceY: '5.999', 
-                  features: ['Profesyonel\'deki her şey', 'Sınırsız Şantiye Yönetimi', 'Banka Entegrasyonları', 'Sınırsız Kullanıcı', 'Özel Müşteri Temsilcisi'] 
-                }
-              ].map((plan, i) => (
-                <div key={i} style={{ 
-                  background: plan.isPopular ? C.dark : '#fff', color: plan.isPopular ? C.cream : C.dark, 
-                  padding: '40px 32px', borderRadius: '12px',
-                  border: plan.isPopular ? 'none' : `1px solid ${C.border}`,
-                  position: 'relative'
-                }}>
-                  {plan.isPopular && (
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', background: C.amber, color: C.dark, padding: '8px', fontSize: '13px', fontWeight: '800', textAlign: 'center', borderRadius: '12px 12px 0 0' }}>
-                      EN ÇOK TERCİH EDİLEN
-                    </div>
-                  )}
-                  <div style={{ marginTop: plan.isPopular ? '24px' : '0' }}>
-                    <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '4px' }}>{plan.name}</h3>
-                    <p style={{ fontSize: '14px', color: plan.isPopular ? 'rgba(248,247,244,0.6)' : C.text3, marginBottom: '24px' }}>{plan.target}</p>
-                    <div style={{ marginBottom: '32px' }}>
-                      <span style={{ fontSize: '40px', fontWeight: '900' }}>₺{isYearly ? plan.priceY : plan.priceM}</span>
-                      <span style={{ fontSize: '16px', color: plan.isPopular ? 'rgba(248,247,244,0.6)' : C.text3 }}> / ay</span>
-                      {isYearly && <div style={{ fontSize: '13px', color: C.amber, marginTop: '4px', fontWeight: '600' }}>Yıllık peşin faturalandırılır</div>}
-                    </div>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      {plan.features.map((f, j) => (
-                        <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', fontWeight: '500' }}>
-                          <CheckIcon /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <a href="/login" style={{ display: 'block', textAlign: 'center', background: plan.isPopular ? C.amber : C.cream2, color: C.dark, padding: '16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '800', fontSize: '15px' }}>
-                      Hemen Başla
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* --- FOOTER (KOYU ARKA PLAN) --- */}
-      <footer style={{ background: C.dark, borderTop: `1px solid rgba(255,255,255,0.1)`, padding: '64px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '48px', justifyContent: 'space-between' }}>
-          
-          <div style={{ flex: '1 1 300px' }}>
-            {/* Logo - Çerçeveli */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <div style={{ width: '36px', height: '36px', border: `2px solid ${C.amber}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <LogoIcon size={22} variant="dark" />
-              </div>
-              <span style={{ fontSize: '22px', fontWeight: '900', color: C.cream }}>yap<span style={{ color: C.amber }}>ivo</span></span>
-            </div>
-            <p style={{ color: 'rgba(248,247,244,0.6)', fontSize: '14px', lineHeight: '1.6' }}>
-              Müteahhitler, taşeronlar ve yapı firmaları için özel olarak tasarlanmış, bulut tabanlı yeni nesil inşaat finans ve yönetim platformu.
+      {/* ÖZELLİKLER */}
+      <section id="ozellikler" ref={addRef} className="fade-up"
+        style={{ padding: '80px 24px', background: '#fff' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+            <p style={{ fontSize: '12px', fontWeight: '700', color: C.amber, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>ÖZELLİKLER</p>
+            <h2 style={{ fontSize: '40px', fontWeight: '900', letterSpacing: '-1px', color: C.dark, marginBottom: '16px' }}>
+              İnşaatın İhtiyacı Olan Her Şey
+            </h2>
+            <p style={{ fontSize: '17px', color: C.text2, maxWidth: '500px', margin: '0 auto' }}>
+              Sektörün gerçek sorunlarına odaklandık. Başka yazılımların sunmadığı modüller burada.
             </p>
           </div>
-          
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '64px' }}>
-            <div>
-              <h4 style={{ fontSize: '16px', fontWeight: '700', color: C.cream, marginBottom: '16px' }}>Ürün</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <a href="#features" style={{ color: 'rgba(248,247,244,0.6)', textDecoration: 'none', fontSize: '14px' }}>Özellikler</a>
-                <a href="#how-it-works" style={{ color: 'rgba(248,247,244,0.6)', textDecoration: 'none', fontSize: '14px' }}>Nasıl Çalışır?</a>
-                <a href="#pricing" style={{ color: 'rgba(248,247,244,0.6)', textDecoration: 'none', fontSize: '14px' }}>Fiyatlar</a>
+
+          <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            {features.map((f, i) => (
+              <div key={i} style={{ background: C.cream, borderRadius: '12px', padding: '28px', border: `1px solid ${C.border}`, transition: 'box-shadow 0.2s, border-color 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(27,46,94,0.08)'; e.currentTarget.style.borderColor = C.amber }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = C.border }}>
+                <div style={{ fontSize: '28px', marginBottom: '14px' }}>{f.icon}</div>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: C.dark, marginBottom: '8px' }}>{f.title}</h3>
+                <p style={{ fontSize: '14px', color: C.text2, lineHeight: '1.6' }}>{f.desc}</p>
               </div>
-            </div>
-            <div>
-              <h4 style={{ fontSize: '16px', fontWeight: '700', color: C.cream, marginBottom: '16px' }}>İletişim</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <span style={{ color: 'rgba(248,247,244,0.6)', fontSize: '14px' }}>destek@yapivo.com</span>
-                <span style={{ color: 'rgba(248,247,244,0.6)', fontSize: '14px' }}>İstanbul, Türkiye</span>
-              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FİYATLAR */}
+      <section id="fiyatlar" ref={addRef} className="fade-up"
+        style={{ padding: '80px 24px', background: C.dark }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <p style={{ fontSize: '12px', fontWeight: '700', color: C.amber, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>FİYATLAR</p>
+            <h2 style={{ fontSize: '40px', fontWeight: '900', letterSpacing: '-1px', color: '#F8F7F4', marginBottom: '16px' }}>
+              Sade Fiyatlandırma
+            </h2>
+            <p style={{ fontSize: '17px', color: 'rgba(248,247,244,0.5)', marginBottom: '32px' }}>
+              Gizli ücret yok. İstediğiniz zaman iptal edin.
+            </p>
+
+            {/* Toggle */}
+            <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.08)', borderRadius: '10px', padding: '4px', gap: '4px' }}>
+              {[['monthly','Aylık'],['yearly','Yıllık']].map(([key, label]) => (
+                <button key={key} onClick={() => setBillingCycle(key)}
+                  style={{ padding: '8px 24px', borderRadius: '7px', border: 'none', fontSize: '13px', fontWeight: '600', transition: 'all 0.2s', background: billingCycle === key ? '#F8F7F4' : 'transparent', color: billingCycle === key ? C.dark : 'rgba(248,247,244,0.5)' }}>
+                  {label} {key === 'yearly' && <span style={{ fontSize: '11px', color: C.amber, marginLeft: '4px' }}>-2 ay</span>}
+                </button>
+              ))}
             </div>
           </div>
 
+          {/* Paketler */}
+          <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', alignItems: 'start' }}>
+            {plans.map((plan, i) => (
+              <div key={i} className={plan.highlight ? 'pricing-card-pro' : ''} style={{
+                background: plan.highlight ? C.amber : 'rgba(255,255,255,0.05)',
+                borderRadius: '16px',
+                padding: '32px',
+                border: plan.highlight ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                transform: plan.highlight ? 'scale(1.03)' : 'scale(1)',
+                position: 'relative',
+              }}>
+                {plan.badge && (
+                  <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: C.amber, border: `2px solid ${C.dark}`, color: C.dark, padding: '3px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: '700', whiteSpace: 'nowrap' }}>
+                    {plan.badge}
+                  </div>
+                )}
+
+                <div style={{ marginBottom: '20px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: plan.highlight ? C.dark : '#F8F7F4', marginBottom: '6px' }}>{plan.name}</h3>
+                  <p style={{ fontSize: '13px', color: plan.highlight ? 'rgba(27,46,94,0.65)' : 'rgba(248,247,244,0.45)' }}>{plan.desc}</p>
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
+                  <span style={{ fontSize: '44px', fontWeight: '900', color: plan.highlight ? C.dark : '#F8F7F4', letterSpacing: '-1px' }}>₺{plan.price}</span>
+                  <span style={{ fontSize: '13px', color: plan.highlight ? 'rgba(27,46,94,0.5)' : 'rgba(248,247,244,0.4)' }}>/ay</span>
+                  {billingCycle === 'yearly' && <div style={{ fontSize: '11px', color: plan.highlight ? 'rgba(27,46,94,0.5)' : 'rgba(248,247,244,0.35)', marginTop: '2px' }}>yıllık faturalandırılır</div>}
+                </div>
+
+                {/* Kullanıcı bilgisi */}
+                <div style={{ background: plan.highlight ? 'rgba(27,46,94,0.1)' : 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px 14px', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: plan.highlight ? C.dark : '#F8F7F4' }}>{plan.users}</div>
+                  <div style={{ fontSize: '11px', color: plan.highlight ? 'rgba(27,46,94,0.5)' : 'rgba(248,247,244,0.4)', marginTop: '2px' }}>{plan.extra}</div>
+                </div>
+
+                <a href="/login" style={{ display: 'block', marginBottom: '24px' }}>
+                  <button style={{
+                    width: '100%', padding: '13px', borderRadius: '9px', fontSize: '14px', fontWeight: '700', border: plan.highlight ? 'none' : `1.5px solid rgba(255,255,255,0.25)`,
+                    background: plan.highlight ? C.dark : 'transparent',
+                    color: plan.highlight ? '#F8F7F4' : '#F8F7F4',
+                    transition: 'opacity 0.15s',
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                    onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                    {plan.cta}
+                  </button>
+                </a>
+
+                <div style={{ borderTop: plan.highlight ? '1px solid rgba(27,46,94,0.15)' : '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
+                  {plan.features.map((f, j) => (
+                    <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '13px', flexShrink: 0, color: f.yes ? (plan.highlight ? C.dark : C.amber) : 'rgba(255,255,255,0.2)', fontWeight: '700' }}>
+                        {f.yes ? '✓' : '—'}
+                      </span>
+                      <span style={{ fontSize: '13px', color: f.yes ? (plan.highlight ? C.dark : 'rgba(248,247,244,0.85)') : 'rgba(255,255,255,0.25)' }}>
+                        {f.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ textAlign: 'center', marginTop: '32px', fontSize: '13px', color: 'rgba(248,247,244,0.3)' }}>
+            Tüm paketlerde 14 gün ücretsiz deneme · KDV dahil değildir
+          </p>
         </div>
-        
-        <div style={{ maxWidth: '1200px', margin: '48px auto 0 auto', paddingTop: '24px', borderTop: `1px solid rgba(255,255,255,0.1)`, textAlign: 'center', color: 'rgba(248,247,244,0.4)', fontSize: '13px' }}>
-          © {new Date().getFullYear()} Yapivo Yazılım Teknolojileri. Tüm hakları saklıdır.
+      </section>
+
+      {/* HAKKIMIZDA / NEDEN YAPIVO */}
+      <section id="hakkimizda" ref={addRef} className="fade-up"
+        style={{ padding: '80px 24px', background: C.cream }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div className="why-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
+            <div>
+              <p style={{ fontSize: '12px', fontWeight: '700', color: C.amber, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>NEDEN YAPIVO</p>
+              <h2 style={{ fontSize: '36px', fontWeight: '900', letterSpacing: '-1px', color: C.dark, marginBottom: '20px', lineHeight: '1.1' }}>
+                İnşaatçının Dilini Konuşan Yazılım
+              </h2>
+              <p style={{ fontSize: '16px', color: C.text2, lineHeight: '1.7', marginBottom: '32px' }}>
+                Logo çok karmaşık. Genel muhasebe programları inşaatı anlamıyor. Yapivo sıfırdan inşaat sektörü için kurgulandı.
+              </p>
+              {[
+                ['Çek takibi', 'Vade gelince sistem sizi uyarır, sürpriz olmaz.'],
+                ['Proje kar/zarar', 'Her projenin geliri, gideri ve net karı tek ekranda.'],
+                ['Hakediş', 'Aylık imalat bazlı tahakkuk, PDF çıktısı, taşeron takibi.'],
+                ['Türk standartları', 'TL, USD, EUR, vergi numarası, vergi dairesi — hepsi hazır.'],
+              ].map(([title, desc]) => (
+                <div key={title} style={{ display: 'flex', gap: '14px', marginBottom: '20px' }}>
+                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: C.amber, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                    <span style={{ color: C.dark, fontSize: '11px', fontWeight: '700' }}>✓</span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: '700', color: C.dark, marginBottom: '3px' }}>{title}</div>
+                    <div style={{ fontSize: '13px', color: C.text2 }}>{desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Sağ — Mock dashboard kartı */}
+            <div className="mock-dashboard" style={{ background: C.dark, borderRadius: '16px', padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '24px', height: '24px', border: `1.5px solid ${C.amber}`, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                     <LogoIcon size={14} variant="light" />
+                  </div>
+                  <span style={{ fontSize: '15px', fontWeight: '800', color: '#F8F7F4' }}>yap<span style={{ color: C.amber }}>ivo</span></span>
+                </div>
+                <span style={{ fontSize: '11px', color: 'rgba(248,247,244,0.3)' }}>Dashboard</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+                {[
+                  ['Toplam Gelir', '₺2.450.000', '#15803d'],
+                  ['Toplam Gider', '₺1.820.000', '#dc2626'],
+                  ['Net Kar', '₺630.000', C.amber],
+                  ['Aktif Proje', '4', '#F8F7F4'],
+                ].map(([label, val, color]) => (
+                  <div key={label} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '12px' }}>
+                    <div style={{ fontSize: '10px', color: 'rgba(248,247,244,0.35)', marginBottom: '6px', letterSpacing: '0.04em' }}>{label.toUpperCase()}</div>
+                    <div style={{ fontSize: '18px', fontWeight: '800', color }}>{val}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '14px' }}>
+                <div style={{ fontSize: '11px', color: 'rgba(248,247,244,0.35)', marginBottom: '10px', letterSpacing: '0.04em' }}>SON İŞLEMLER</div>
+                {[
+                  ['3+1 Daire Satışı', '+₺850.000', '#15803d'],
+                  ['Beton İşçiliği', '-₺120.000', '#dc2626'],
+                  ['Demir Alımı', '-₺85.000', '#dc2626'],
+                ].map(([title, amount, color]) => (
+                  <div key={title} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '12px', color: 'rgba(248,247,244,0.7)' }}>{title}</span>
+                    <span style={{ fontSize: '13px', fontWeight: '700', color }}>{amount}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section ref={addRef} className="fade-up"
+        style={{ padding: '80px 24px', background: '#fff', textAlign: 'center' }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '40px', fontWeight: '900', letterSpacing: '-1px', color: C.dark, marginBottom: '16px' }}>
+            Hazır mısınız?
+          </h2>
+          <p style={{ fontSize: '18px', color: C.text2, marginBottom: '36px' }}>
+            14 gün ücretsiz deneyin. Kart bilgisi gerekmez.
+          </p>
+          <a href="/login">
+            <button style={{ background: C.amber, color: C.dark, fontWeight: '700', padding: '18px 48px', borderRadius: '12px', border: 'none', fontSize: '18px', transition: 'transform 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
+              Ücretsiz Denemeye Başla →
+            </button>
+          </a>
+          <p style={{ fontSize: '13px', color: C.text3, marginTop: '16px' }}>
+            Kredi kartı gerekmez · İstediğiniz zaman iptal edin
+          </p>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer style={{ background: C.dark, padding: '48px 24px', borderTop: `1px solid rgba(255,255,255,0.06)` }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '40px', marginBottom: '48px' }}>
+            <div>
+              {/* Logo Alanı - Amber Çerçeveli Koyu Tema */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                <div style={{ width: '36px', height: '36px', border: `2px solid ${C.amber}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <LogoIcon size={22} variant="light" />
+                </div>
+                <span style={{ fontSize: '22px', fontWeight: '900', color: '#F8F7F4' }}>yap<span style={{ color: C.amber }}>ivo</span></span>
+              </div>
+              <p style={{ fontSize: '13px', color: 'rgba(248,247,244,0.4)', lineHeight: '1.6', maxWidth: '220px' }}>
+                İnşaatınızın Dijital Defteri. Müteahhitler için, müteahhitler tarafından.
+              </p>
+            </div>
+
+            {[
+              ['Ürün', [['#ozellikler','Özellikler'],['#fiyatlar','Fiyatlar'],['/login','Giriş Yap']]],
+              ['Şirket', [['#hakkimizda','Hakkımızda'],['mailto:hello@yapivo.com.tr','İletişim']]],
+              ['Yasal', [['#','Gizlilik Politikası'],['#','Kullanım Koşulları']]],
+            ].map(([title, links]) => (
+              <div key={title}>
+                <h4 style={{ fontSize: '13px', fontWeight: '700', color: '#F8F7F4', marginBottom: '16px' }}>{title}</h4>
+                <ul style={{ listStyle: 'none' }}>
+                  {links.map(([href, label]) => (
+                    <li key={label} style={{ marginBottom: '10px' }}>
+                      <a href={href} style={{ fontSize: '13px', color: 'rgba(248,247,244,0.4)', transition: 'color 0.15s' }}
+                        onMouseEnter={e => e.target.style.color = C.amber}
+                        onMouseLeave={e => e.target.style.color = 'rgba(248,247,244,0.4)'}>
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <p style={{ fontSize: '12px', color: 'rgba(248,247,244,0.25)' }}>© {new Date().getFullYear()} Yapivo. Tüm hakları saklıdır.</p>
+            <p style={{ fontSize: '12px', color: 'rgba(248,247,244,0.25)' }}>yapivo.com</p>
+          </div>
         </div>
       </footer>
     </>
